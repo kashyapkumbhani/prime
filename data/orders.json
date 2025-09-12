@@ -1,0 +1,110 @@
+{
+  "orders": [
+    {
+      "id": "ORD-001",
+      "serviceType": "flight-reservation",
+      "customerName": "John Doe",
+      "customerEmail": "john.doe@email.com",
+      "customerPhone": "+1-555-0123",
+      "numberOfTravelers": 2,
+      "totalAmount": 1998,
+      "status": "completed",
+      "createdAt": "2024-01-15T10:30:00Z",
+      "completedAt": "2024-01-15T10:45:00Z",
+      "details": {
+        "departureAirport": "John F. Kennedy International Airport - New York, United States",
+        "arrivalAirport": "London Heathrow Airport - London, United Kingdom",
+        "departureDate": "2024-02-15",
+        "returnDate": "2024-02-28",
+        "tripType": "round-trip",
+        "purpose": "Visa Submission / Application"
+      }
+    },
+    {
+      "id": "ORD-002",
+      "serviceType": "hotel-booking",
+      "customerName": "Jane Smith",
+      "customerEmail": "jane.smith@email.com",
+      "customerPhone": "+1-555-0456",
+      "numberOfTravelers": 1,
+      "totalAmount": 799,
+      "status": "processing",
+      "createdAt": "2024-01-15T14:20:00Z",
+      "completedAt": null,
+      "details": {
+        "destinationCity": "Paris",
+        "checkInDate": "2024-03-01",
+        "checkOutDate": "2024-03-07",
+        "numberOfRooms": 1,
+        "numberOfGuests": 1,
+        "purpose": "Tourism"
+      }
+    },
+    {
+      "id": "ORD-003",
+      "serviceType": "travel-insurance",
+      "customerName": "Mike Johnson",
+      "customerEmail": "mike.johnson@email.com",
+      "customerPhone": "+1-555-0789",
+      "numberOfTravelers": 3,
+      "totalAmount": 4497,
+      "status": "completed",
+      "createdAt": "2024-01-14T09:15:00Z",
+      "completedAt": "2024-01-14T09:25:00Z",
+      "details": {
+        "destinationCountry": "Germany",
+        "travelStartDate": "2024-04-10",
+        "travelEndDate": "2024-04-25",
+        "coverageType": "basic",
+        "purpose": "Business Travel"
+      }
+    },
+    {
+      "id": "ORD-004",
+      "serviceType": "flight-reservation",
+      "customerName": "Sarah Wilson",
+      "customerEmail": "sarah.wilson@email.com",
+      "customerPhone": "+1-555-0321",
+      "numberOfTravelers": 1,
+      "totalAmount": 999,
+      "status": "pending",
+      "createdAt": "2024-01-15T16:45:00Z",
+      "completedAt": null,
+      "details": {
+        "departureAirport": "Mumbai Chhatrapati Shivaji International Airport - Mumbai, India",
+        "arrivalAirport": "Dubai International Airport - Dubai, United Arab Emirates",
+        "departureDate": "2024-02-20",
+        "tripType": "one-way",
+        "purpose": "Visa Extension"
+      }
+    },
+    {
+      "id": "ORD-005",
+      "serviceType": "hotel-booking",
+      "customerName": "David Brown",
+      "customerEmail": "david.brown@email.com",
+      "customerPhone": "+1-555-0654",
+      "numberOfTravelers": 2,
+      "totalAmount": 799,
+      "status": "completed",
+      "createdAt": "2024-01-13T11:30:00Z",
+      "completedAt": "2024-01-13T11:42:00Z",
+      "details": {
+        "destinationCity": "Tokyo",
+        "checkInDate": "2024-05-15",
+        "checkOutDate": "2024-05-22",
+        "numberOfRooms": 1,
+        "numberOfGuests": 2,
+        "purpose": "Conference / Meeting"
+      }
+    }
+  ],
+  "stats": {
+    "totalOrders": 5,
+    "completedOrders": 3,
+    "processingOrders": 1,
+    "pendingOrders": 1,
+    "totalRevenue": 8892,
+    "averageOrderValue": 1778.4
+  }
+}

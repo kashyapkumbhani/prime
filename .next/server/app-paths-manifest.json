@@ -1,0 +1,5 @@
+{
+  "/api/orders/[orderId]/route": "app/api/orders/[orderId]/route.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/order-confirmation/page": "app/order-confirmation/page.js"
+}

@@ -1,0 +1,145 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// Admin Users Model
+model AdminUser {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+  lastLogin DateTime?
+  
+  @@map("admin_users")
+}
+
+// Customer Model
+model Customer {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  phone     String?
+  createdAt DateTime @default(now())
+  orders    Order[]
+  
+  @@map("customers")
+}
+
+// Order Model
+model Order {
+  id              String         @id @default(cuid())
+  serviceType     ServiceType
+  customerId      Int
+  customerName    String
+  customerEmail   String
+  customerPhone   String?
+  numberOfTravelers Int
+  totalAmount     Float
+  paymentMethod   String?
+  status          OrderStatus    @default(PENDING)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  completedAt     DateTime?
+  
+  // Relations
+  customer        Customer       @relation(fields: [customerId], references: [id])
+  travelers       Traveler[]
+  flightBooking   FlightBooking?
+  hotelBooking    HotelBooking?
+  insuranceBooking InsuranceBooking?
+  
+  @@map("orders")
+}
+
+// Traveler Model
+model Traveler {
+  id          Int      @id @default(autoincrement())
+  orderId     String
+  title       String
+  firstName   String
+  lastName    String
+  dateOfBirth DateTime?
+  isPrimary   Boolean  @default(false)
+  
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  @@map("travelers")
+}
+
+// Flight Booking Model
+model FlightBooking {
+  id               Int       @id @default(autoincrement())
+  orderId          String    @unique
+  tripType         String    // "one-way" or "round-trip"
+  departureAirport String
+  arrivalAirport   String
+  departureDate    DateTime
+  returnDate       DateTime?
+  purpose          String
+  specialRequests  String?   @db.Text
+  deliveryTiming   String    // "now" or "later"
+  pnrNumber        String?   // Generated PNR
+  
+  order            Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  @@map("flight_bookings")
+}
+
+// Hotel Booking Model
+model HotelBooking {
+  id              Int       @id @default(autoincrement())
+  orderId         String    @unique
+  destinationCity String
+  checkInDate     DateTime
+  checkOutDate    DateTime
+  numberOfRooms   Int
+  numberOfGuests  Int
+  purpose         String
+  specialRequests String?   @db.Text
+  confirmationNumber String? // Generated confirmation
+  
+  order           Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  @@map("hotel_bookings")
+}
+
+// Insurance Booking Model
+model InsuranceBooking {
+  id                    Int       @id @default(autoincrement())
+  orderId               String    @unique
+  destinationCountry    String
+  travelStartDate       DateTime
+  travelEndDate         DateTime
+  coverageType          String    // "basic" or "premium"
+  purpose               String
+  preExistingConditions String?   @db.Text
+  specialRequests       String?   @db.Text
+  policyNumber          String?   // Generated policy number
+  
+  order                 Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  @@map("insurance_bookings")
+}
+
+// Enums
+enum ServiceType {
+  FLIGHT_RESERVATION
+  HOTEL_BOOKING
+  TRAVEL_INSURANCE
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  CANCELLED
+}
