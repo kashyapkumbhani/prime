@@ -8,8 +8,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { 
   CreditCard, 
   Smartphone, 
@@ -21,7 +19,6 @@ import {
   Plane,
   Hotel,
   Heart,
-  Users,
   Calendar,
   MapPin,
   Clock,
@@ -52,33 +49,68 @@ function PaymentContent() {
     customerPhone: "",
     // Flight specific details
     tripType: "",
-    departureAirport: null,
-    arrivalAirport: null,
-    departureDate: null,
-    returnDate: null,
+    departureAirport: null as { name: string; city: string; country: string; code: string } | null,
+    arrivalAirport: null as { name: string; city: string; country: string; code: string } | null,
+    departureDate: null as Date | null,
+    returnDate: null as Date | null,
     purpose: "",
-    deliveryTiming: ""
+    deliveryTiming: "",
+    // Traveler details
+    primaryTraveler: null as { title: string; firstName: string; lastName: string } | null,
+    additionalTravelers: [] as { title: string; firstName: string; lastName: string }[],
+    specialRequest: ""
   });
 
   useEffect(() => {
     // Try to get booking details from localStorage if available
     const savedBookingData = localStorage.getItem("currentBooking");
     if (savedBookingData) {
-      const bookingData = JSON.parse(savedBookingData);
-      setBookingDetails(prev => ({
-        ...prev,
-        ...bookingData
-      }));
+      try {
+        const bookingData = JSON.parse(savedBookingData);
+        console.log("Booking data from localStorage:", bookingData);
+        setBookingDetails(prev => ({
+          ...prev,
+          ...bookingData
+        }));
+      } catch (error) {
+        console.error("Error parsing booking data:", error);
+      }
     }
     
     // Also try to get detailed form data from localStorage
     const savedFormData = localStorage.getItem("flightFormData");
     if (savedFormData) {
-      const formData = JSON.parse(savedFormData);
-      setBookingDetails(prev => ({
-        ...prev,
-        ...formData
-      }));
+      try {
+        const formData = JSON.parse(savedFormData);
+        console.log("Flight form data from localStorage:", formData);
+        setBookingDetails(prev => ({
+          ...prev,
+          ...formData
+        }));
+      } catch (error) {
+        console.error("Error parsing form data:", error);
+      }
+    }
+    
+    // Debug: Log all localStorage keys to see what's available
+    console.log("Available localStorage keys:", Object.keys(localStorage));
+    
+    // Try other possible localStorage keys
+    const allKeys = Object.keys(localStorage);
+    const relevantKeys = allKeys.filter(key => 
+      key.includes('flight') || key.includes('booking') || key.includes('travel')
+    );
+    
+    if (relevantKeys.length > 0) {
+      console.log("Found relevant localStorage keys:", relevantKeys);
+      relevantKeys.forEach(key => {
+        try {
+          const data = localStorage.getItem(key);
+          console.log(`${key}:`, JSON.parse(data));
+        } catch (e) {
+          console.log(`${key} (raw):`, localStorage.getItem(key));
+        }
+      });
     }
   }, []);
 
@@ -191,372 +223,336 @@ function PaymentContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-12">
           <Button 
             variant="outline" 
             onClick={() => router.back()}
-            className="mb-4"
+            className="mb-6 hover:bg-blue-50 border-blue-200 text-blue-700"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Booking
           </Button>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Complete Your Payment</h1>
-          <p className="text-gray-600">Secure payment processing for your travel booking</p>
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">Complete Your Payment</h1>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">Review your booking details and proceed with secure payment</p>
+          </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Payment Methods - Left Side */}
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Shield className="h-5 w-5 mr-2 text-green-600" />
-                Secure Payment
-              </CardTitle>
-              <CardDescription>
-                Choose your preferred payment method. All transactions are encrypted and secure.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Payment Method Selection */}
-              <div>
-                <Label className="text-base font-medium mb-4 block">Select Payment Method</Label>
-                <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {paymentMethods.map((method) => {
-                    const IconComponent = method.icon;
-                    return (
-                      <Label
-                        key={method.id}
-                        htmlFor={method.id}
-                        className={`flex flex-col items-center space-y-2 p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-md ${
-                          paymentMethod === method.id ? 'border-blue-500 bg-blue-50 shadow-lg' : 'border-gray-200 hover:border-gray-300'
-                        }`}
-                      >
-                        <RadioGroupItem value={method.id} id={method.id} className="mb-2" />
-                        <IconComponent className={`h-8 w-8 ${
-                          paymentMethod === method.id ? 'text-blue-600' : 'text-gray-600'
-                        }`} />
-                        <div className="text-center">
-                          <div className="font-medium text-sm">{method.name}</div>
-                          <div className="text-xs text-gray-500 mt-1">{method.description}</div>
+        <div className="space-y-8">
+          {/* Premium Order Summary Card */}
+          <Card className="overflow-hidden shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
+            <CardContent className="p-0">
+              <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 text-white p-8 relative overflow-hidden">
+                {/* Background Pattern */}
+                <div className="absolute inset-0 opacity-10">
+                  <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full transform translate-x-32 -translate-y-32"></div>
+                  <div className="absolute bottom-0 left-0 w-64 h-64 bg-white rounded-full transform -translate-x-20 translate-y-20"></div>
+                </div>
+                
+                <div className="relative z-10">
+                  <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8">
+                    <div className="flex items-center space-x-4 mb-6 lg:mb-0">
+                      <div className="bg-white/20 rounded-full p-4">
+                        {getServiceIcon(bookingDetails.serviceType)}
+                      </div>
+                      <div>
+                        <h2 className="text-3xl font-bold mb-1">{getServiceName(bookingDetails.serviceType)}</h2>
+                        <p className="text-blue-100 flex items-center">
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          With Real PNR Number • Embassy Approved
+                        </p>
+                        {/* Lead Passenger Info */}
+                        {bookingDetails.primaryTraveler && (
+                          <div className="mt-3 bg-white/10 rounded-lg px-3 py-2">
+                            <div className="text-xs text-blue-200 mb-1">Lead Passenger</div>
+                            <div className="text-white font-semibold">
+                              {bookingDetails.primaryTraveler.title} {bookingDetails.primaryTraveler.firstName} {bookingDetails.primaryTraveler.lastName}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center border border-white/20">
+                      <div className="text-4xl font-bold mb-2">
+                        ₹{bookingDetails.amount.toLocaleString()}
+                      </div>
+                      <div className="text-blue-100 text-sm">
+                        {bookingDetails.travelers} Traveler{bookingDetails.travelers > 1 ? 's' : ''} • ₹999 each
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Enhanced Trip Route Visual with More Details */}
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-6 border border-white/20">
+                    <div className="mb-4">
+                      <h3 className="text-lg font-bold text-white mb-2">Travel Details</h3>
+                    </div>
+                    
+                    {/* Route Information - Always show the flight path */}
+                    <div className="flex flex-col md:flex-row items-center justify-between mb-4">
+                      {/* Departure */}
+                      <div className="text-center mb-4 md:mb-0">
+                        <div className="text-2xl font-bold mb-1">
+                          {bookingDetails.departureAirport?.code || "DEP"}
                         </div>
-                      </Label>
-                    );
-                  })}
-                </RadioGroup>
+                        <div className="text-blue-100 text-sm font-medium">
+                          {bookingDetails.departureAirport?.city || "Departure City"}
+                        </div>
+                        <div className="text-xs text-blue-200">
+                          {bookingDetails.departureAirport?.name || "International Airport"}
+                        </div>
+                        <div className="text-xs text-blue-200 mt-1 bg-white/10 rounded px-2 py-1">
+                          {(() => {
+                            if (bookingDetails.departureDate) {
+                              try {
+                                const date = new Date(bookingDetails.departureDate);
+                                if (date.toString() !== 'Invalid Date') {
+                                  return `Depart: ${format(date, "MMM dd, yyyy")}`;
+                                }
+                              } catch (e) {
+                                console.log("Date parsing error:", e, bookingDetails.departureDate);
+                              }
+                            }
+                            return "Departure Date: TBD";
+                          })()} 
+                        </div>
+                      </div>
+                      
+                      {/* Flight Path */}
+                      <div className="flex-1 flex items-center justify-center mb-4 md:mb-0">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-3 h-3 bg-white rounded-full"></div>
+                          <div className="h-px bg-white/40 w-16 md:w-32"></div>
+                          <Plane className="h-6 w-6 text-white" />
+                          <div className="h-px bg-white/40 w-16 md:w-32"></div>
+                          <div className="w-3 h-3 bg-white rounded-full"></div>
+                        </div>
+                      </div>
+                      
+                      {/* Arrival */}
+                      <div className="text-center">
+                        <div className="text-2xl font-bold mb-1">
+                          {bookingDetails.arrivalAirport?.code || "ARR"}
+                        </div>
+                        <div className="text-blue-100 text-sm font-medium">
+                          {bookingDetails.arrivalAirport?.city || "Arrival City"}
+                        </div>
+                        <div className="text-xs text-blue-200">
+                          {bookingDetails.arrivalAirport?.name || "International Airport"}
+                        </div>
+                        {bookingDetails.tripType === "round-trip" && (
+                          <div className="text-xs text-blue-200 mt-1 bg-white/10 rounded px-2 py-1">
+                            {(() => {
+                              if (bookingDetails.returnDate) {
+                                try {
+                                  const date = new Date(bookingDetails.returnDate);
+                                  if (date.toString() !== 'Invalid Date') {
+                                    return `Return: ${format(date, "MMM dd, yyyy")}`;
+                                  }
+                                } catch (e) {
+                                  console.log("Return date parsing error:", e, bookingDetails.returnDate);
+                                }
+                              }
+                              return "Return Date: TBD";
+                            })()}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Additional Travel Info - Always show available data */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                      <div className="bg-white/5 rounded-lg p-3 text-center">
+                        <div className="text-blue-200 mb-1">Trip Type</div>
+                        <div className="text-white font-semibold capitalize">
+                          {bookingDetails.tripType ? bookingDetails.tripType.replace("-", " ") : "One Way"}
+                        </div>
+                      </div>
+                      
+                      <div className="bg-white/5 rounded-lg p-3 text-center">
+                        <div className="text-blue-200 mb-1">Purpose</div>
+                        <div className="text-white font-semibold">
+                          {bookingDetails.purpose || "Business"}
+                        </div>
+                      </div>
+                      
+                      <div className="bg-white/5 rounded-lg p-3 text-center">
+                        <div className="text-blue-200 mb-1">Passengers</div>
+                        <div className="text-white font-semibold">
+                          {bookingDetails.travelers} Traveler{bookingDetails.travelers > 1 ? 's' : ''}
+                        </div>
+                      </div>
+                      
+                      <div className="bg-white/5 rounded-lg p-3 text-center">
+                        <div className="text-blue-200 mb-1">Delivery</div>
+                        <div className="text-white font-semibold">
+                          {bookingDetails.deliveryTiming || "15-30 min"}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Data Source Indicator */}
+                    <div className="mt-4 text-center">
+                      <div className="text-xs text-blue-300">
+                        {bookingDetails.departureAirport && bookingDetails.arrivalAirport ? 
+                          "✓ Flight details loaded from booking form" : 
+                          "⚠ Using sample data - complete booking form for actual details"
+                        }
+                      </div>
+                    </div>
+                    
+                  
+                  </div>
+                  
+                  {/* Service Features */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                    <div className="flex items-center space-x-2">
+                      <CheckCircle className="h-4 w-4 text-green-300" />
+                      <span className="text-blue-100">Real PNR included</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Clock className="h-4 w-4 text-green-300" />
+                      <span className="text-blue-100">15-30 min delivery</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Shield className="h-4 w-4 text-green-300" />
+                      <span className="text-blue-100">Embassy approved</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Globe className="h-4 w-4 text-green-300" />
+                      <span className="text-blue-100">Worldwide accepted</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-
-              {/* Card Details Form */}
-              {paymentMethod === "card" && (
-                <div className="bg-gray-50 p-6 rounded-lg space-y-4">
-                  <h3 className="font-medium text-gray-900 mb-4">Card Details</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="md:col-span-2">
-                      <Label htmlFor="cardNumber">Card Number</Label>
-                      <Input
-                        id="cardNumber"
-                        placeholder="1234 5678 9012 3456"
-                        value={cardDetails.number}
-                        onChange={(e) => handleInputChange("number", e.target.value)}
-                        className="text-lg h-12"
-                      />
+              
+              {/* Payment Button Section */}
+              <div className="bg-gradient-to-r from-gray-50 to-white p-8">
+                <div className="max-w-md mx-auto text-center">
+                  <Button
+                    onClick={handlePayment}
+                    disabled={isProcessing}
+                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-6 text-xl font-bold rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 border-0"
+                  >
+                    {isProcessing ? (
+                      <>
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mr-3" />
+                        Processing Payment...
+                      </>
+                    ) : (
+                      <>
+                        <Lock className="h-6 w-6 mr-3" />
+                        Pay ₹{bookingDetails.amount.toLocaleString()} Securely
+                      </>
+                    )}
+                  </Button>
+                  
+                  <div className="flex items-center justify-center space-x-6 mt-4 text-sm text-gray-500">
+                    <div className="flex items-center">
+                      <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
+                      <span>256-bit SSL Encryption</span>
                     </div>
-                    <div>
-                      <Label htmlFor="expiry">Expiry Date</Label>
-                      <Input
-                        id="expiry"
-                        placeholder="MM/YY"
-                        value={cardDetails.expiry}
-                        onChange={(e) => handleInputChange("expiry", e.target.value)}
-                        className="h-12"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="cvv">CVV</Label>
-                      <Input
-                        id="cvv"
-                        placeholder="123"
-                        value={cardDetails.cvv}
-                        onChange={(e) => handleInputChange("cvv", e.target.value)}
-                        className="h-12"
-                      />
-                    </div>
-                    <div className="md:col-span-2">
-                      <Label htmlFor="cardName">Cardholder Name</Label>
-                      <Input
-                        id="cardName"
-                        placeholder="John Doe"
-                        value={cardDetails.name}
-                        onChange={(e) => handleInputChange("name", e.target.value)}
-                        className="h-12"
-                      />
+                    <div className="flex items-center">
+                      <Shield className="h-4 w-4 mr-2 text-green-600" />
+                      <span>PCI DSS Compliant</span>
                     </div>
                   </div>
-                </div>
-              )}
-
-              {/* UPI Form */}
-              {paymentMethod === "upi" && (
-                <div className="bg-gray-50 p-6 rounded-lg">
-                  <h3 className="font-medium text-gray-900 mb-4">UPI Payment</h3>
-                  <div>
-                    <Label htmlFor="upiId">UPI ID</Label>
-                    <Input
-                      id="upiId"
-                      placeholder="yourname@paytm"
-                      className="h-12 text-lg"
-                    />
-                    <p className="text-sm text-gray-500 mt-2">Enter your UPI ID to proceed with payment</p>
-                  </div>
-                </div>
-              )}
-
-              {/* Net Banking */}
-              {paymentMethod === "netbanking" && (
-                <div className="bg-gray-50 p-6 rounded-lg">
-                  <h3 className="font-medium text-gray-900 mb-4">Net Banking</h3>
-                  <div>
-                    <Label>Select Your Bank</Label>
-                    <select className="w-full mt-2 p-3 h-12 border border-gray-300 rounded-md bg-white">
-                      <option>Select Bank</option>
-                      <option>State Bank of India</option>
-                      <option>HDFC Bank</option>
-                      <option>ICICI Bank</option>
-                      <option>Axis Bank</option>
-                      <option>Bank of India</option>
-                      <option>Punjab National Bank</option>
-                    </select>
-                  </div>
-                </div>
-              )}
-
-              {/* Security Notice */}
-              <div className="flex items-center p-3 bg-green-50 rounded-lg">
-                <Lock className="h-5 w-5 text-green-600 mr-3" />
-                <div className="text-sm">
-                  <div className="font-medium text-green-800">Secure Payment</div>
-                  <div className="text-green-600">Your payment information is encrypted and secure</div>
                 </div>
               </div>
             </CardContent>
           </Card>
-
-          {/* Order Summary - Right Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-8">
-              <Card className="overflow-hidden">
-                <CardContent className="p-0">
-                  {/* Header Section */}
-                  <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6">
-                    <h2 className="text-xl font-bold mb-2">Order Summary</h2>
-                    <div className="flex items-center space-x-2 text-blue-100">
-                      {getServiceIcon(bookingDetails.serviceType)}
-                      <span className="text-base font-medium">{getServiceName(bookingDetails.serviceType)}</span>
+          
+          {/* Other Passengers Information - Full Width with 3x3 Grid */}
+          <Card className="shadow-xl border-0 bg-white/90 backdrop-blur-sm">
+            <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
+              <CardTitle className="flex items-center text-xl">
+                <Shield className="h-6 w-6 mr-3 text-blue-600" />
+                Other Passengers ({bookingDetails.additionalTravelers?.length || 0} Companions)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-8">
+              {/* Optimized 3x3 Grid for Desktop, 1 Column for Mobile - Only Additional Travelers */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+                {/* Additional Travelers in 3x3 Grid - Excluding Primary */}
+                {bookingDetails.additionalTravelers && bookingDetails.additionalTravelers.length > 0 ? (
+                  bookingDetails.additionalTravelers.map((traveler, index) => (
+                    <div key={index} className="bg-gray-50 border border-gray-200 rounded-xl p-6 hover:shadow-lg hover:bg-gray-100 transition-all duration-200 relative overflow-hidden">
+                      <div className="absolute top-0 right-0 w-16 h-16 bg-gray-200/30 rounded-full transform translate-x-6 -translate-y-6"></div>
+                      <div className="relative z-10">
+                        <div className="flex items-center justify-between mb-4">
+                          <span className="text-xs font-semibold text-gray-600 bg-gray-200 px-3 py-1 rounded-full">Passenger {index + 2}</span>
+                          <div className="w-7 h-7 bg-gray-300 rounded-full flex items-center justify-center">
+                            <span className="text-xs font-bold text-gray-600">{index + 2}</span>
+                          </div>
+                        </div>
+                        <div className="text-lg font-bold text-gray-900 mb-1">
+                          {traveler.title} {traveler.firstName} {traveler.lastName}
+                        </div>
+                        <div className="text-sm text-gray-500 font-medium">Additional Passenger</div>
+                      </div>
                     </div>
-                    <p className="text-blue-100 text-sm mt-1">With Real PNR Number</p>
-                  </div>
-
-                  {/* Service Details */}
-                  <div className="p-4 border-b">
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-blue-600 mb-1">
-                        ₹{bookingDetails.amount.toLocaleString()}
-                      </div>
-                      <p className="text-gray-600 text-sm">
-                        Total for {bookingDetails.travelers} traveler{bookingDetails.travelers > 1 ? 's' : ''}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        ₹999 per traveler
-                      </p>
+                  ))
+                ) : (
+                  <div className="lg:col-span-3 text-center py-8 bg-gray-50 border border-gray-200 rounded-xl">
+                    <div className="text-lg font-bold text-gray-900 mb-2">
+                      No Additional Passengers
+                    </div>
+                    <div className="text-sm text-gray-600 mb-4">
+                      This booking only includes the lead passenger shown above.
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      Total Travelers: {bookingDetails.travelers} | Additional Passengers: {bookingDetails.additionalTravelers?.length || 0}
                     </div>
                   </div>
-
-                  {/* Trip Details Section */}
-                  {(bookingDetails.departureAirport || bookingDetails.arrivalAirport) && (
-                    <div className="p-4 bg-gray-50 border-b">
-                      <h3 className="font-semibold text-gray-900 mb-2 text-sm">Trip Details</h3>
-                      <div className="space-y-2 text-xs">
-                    {bookingDetails.departureAirport && (
-                      <div className="flex items-center">
-                        <MapPin className="h-4 w-4 text-gray-500 mr-3" />
-                        <div>
-                          <span className="text-gray-500">From: </span>
-                          <span className="font-medium">
-                            {bookingDetails.departureAirport.city} ({bookingDetails.departureAirport.code})
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                    {bookingDetails.arrivalAirport && (
-                      <div className="flex items-center">
-                        <MapPin className="h-4 w-4 text-gray-500 mr-3" />
-                        <div>
-                          <span className="text-gray-500">To: </span>
-                          <span className="font-medium">
-                            {bookingDetails.arrivalAirport.city} ({bookingDetails.arrivalAirport.code})
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                    {bookingDetails.departureDate && (
-                      <div className="flex items-center">
-                        <Calendar className="h-4 w-4 text-gray-500 mr-3" />
-                        <div>
-                          <span className="text-gray-500">Departure: </span>
-                          <span className="font-medium">
-                            {format(new Date(bookingDetails.departureDate), "MMM dd, yyyy")}
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                    {bookingDetails.tripType === "round-trip" && bookingDetails.returnDate && (
-                      <div className="flex items-center">
-                        <Calendar className="h-4 w-4 text-gray-500 mr-3" />
-                        <div>
-                          <span className="text-gray-500">Return: </span>
-                          <span className="font-medium">
-                            {format(new Date(bookingDetails.returnDate), "MMM dd, yyyy")}
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                    {bookingDetails.tripType && (
-                      <div className="flex items-center">
-                        <Plane className="h-4 w-4 text-gray-500 mr-3" />
-                        <div>
-                          <span className="text-gray-500">Trip Type: </span>
-                          <span className="font-medium capitalize">{bookingDetails.tripType.replace("-", " ")}</span>
-                        </div>
-                      </div>
-                    )}
-                    {bookingDetails.purpose && (
-                      <div className="flex items-center">
-                        <CheckCircle className="h-4 w-4 text-gray-500 mr-3" />
-                        <div>
-                          <span className="text-gray-500">Purpose: </span>
-                          <span className="font-medium">{bookingDetails.purpose}</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Customer Details */}
-              {(bookingDetails.customerName || bookingDetails.customerEmail) && (
-                <div className="p-6 border-b">
-                  <h3 className="font-semibold text-gray-900 mb-3">Customer Details</h3>
-                  <div className="space-y-2 text-sm">
+                )}
+              </div>
+              
+              {/* Contact Information */}
+              {(bookingDetails.customerName || bookingDetails.customerEmail || bookingDetails.customerPhone) && (
+                <div className="mt-12 pt-8 border-t border-gray-200">
+                  <h4 className="text-xl font-bold text-gray-900 mb-8 flex items-center">
+                    <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-4">
+                      <span className="text-purple-600 font-bold text-lg">
+                        {bookingDetails.customerName ? bookingDetails.customerName.charAt(0) : 'C'}
+                      </span>
+                    </div>
+                    Contact Information
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {bookingDetails.customerName && (
-                      <div>
-                        <span className="text-gray-500">Name: </span>
-                        <span className="font-medium">{bookingDetails.customerName}</span>
+                      <div className="bg-purple-50 rounded-xl p-6 border border-purple-200 hover:shadow-lg transition-shadow duration-200">
+                        <div className="text-sm text-purple-600 font-bold mb-3 flex items-center">
+                          <div className="w-4 h-4 bg-purple-600 rounded-full mr-2"></div>
+                          Contact Person
+                        </div>
+                        <div className="text-xl font-bold text-gray-900">{bookingDetails.customerName}</div>
                       </div>
                     )}
                     {bookingDetails.customerEmail && (
-                      <div>
-                        <span className="text-gray-500">Email: </span>
-                        <span className="font-medium">{bookingDetails.customerEmail}</span>
+                      <div className="bg-blue-50 rounded-xl p-6 border border-blue-200 hover:shadow-lg transition-shadow duration-200">
+                        <div className="text-sm text-blue-600 font-bold mb-3 flex items-center">
+                          <div className="w-4 h-4 bg-blue-600 rounded-full mr-2"></div>
+                          Email Address
+                        </div>
+                        <div className="font-bold text-gray-900 break-all text-lg">{bookingDetails.customerEmail}</div>
                       </div>
                     )}
                     {bookingDetails.customerPhone && (
-                      <div>
-                        <span className="text-gray-500">Phone: </span>
-                        <span className="font-medium">{bookingDetails.customerPhone}</span>
+                      <div className="bg-green-50 rounded-xl p-6 border border-green-200 hover:shadow-lg transition-shadow duration-200">
+                        <div className="text-sm text-green-600 font-bold mb-3 flex items-center">
+                          <div className="w-4 h-4 bg-green-600 rounded-full mr-2"></div>
+                          Phone Number
+                        </div>
+                        <div className="text-xl font-bold text-gray-900">{bookingDetails.customerPhone}</div>
                       </div>
                     )}
                   </div>
                 </div>
               )}
-
-              {/* Features Section */}
-              <div className="p-6 space-y-4 border-b">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                    <CheckCircle className="w-5 h-5 text-green-600" />
-                  </div>
-                  <span className="text-sm font-medium">Real PNR number included</span>
-                </div>
-                
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Clock className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <span className="text-sm font-medium">Delivered in 15-30 minutes</span>
-                </div>
-                
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                    <CheckCircle className="w-5 h-5 text-purple-600" />
-                  </div>
-                  <span className="text-sm font-medium">Embassy-approved format</span>
-                </div>
-                
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                    <Globe className="w-5 h-5 text-orange-600" />
-                  </div>
-                  <span className="text-sm font-medium">Worldwide acceptance</span>
-                </div>
-              </div>
-
-              {/* Pricing Breakdown */}
-              <div className="p-6 border-b">
-                <h3 className="font-semibold text-gray-900 mb-3">Payment Breakdown</h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span>Service Fee</span>
-                    <span>₹{(bookingDetails.amount * 0.85).toFixed(0)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Processing Fee</span>
-                    <span>₹{(bookingDetails.amount * 0.1).toFixed(0)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Taxes & Fees</span>
-                    <span>₹{(bookingDetails.amount * 0.05).toFixed(0)}</span>
-                  </div>
-                  <Separator />
-                  <div className="flex justify-between text-lg font-semibold">
-                    <span>Total Amount</span>
-                    <span>₹{bookingDetails.amount.toLocaleString()}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Payment Button */}
-              <div className="p-6">
-                <Button
-                  onClick={handlePayment}
-                  disabled={isProcessing}
-                  className="w-full bg-blue-600 hover:bg-blue-700 py-3 text-lg mb-4"
-                >
-                  {isProcessing ? (
-                    <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
-                      Processing Payment...
-                    </>
-                  ) : (
-                    <>
-                      <Lock className="h-5 w-5 mr-2" />
-                      Pay ₹{bookingDetails.amount.toLocaleString()}
-                    </>
-                  )}
-                </Button>
-
-                {/* Trust Indicators */}
-                <div className="text-center text-sm text-gray-500">
-                  <div className="flex items-center justify-center space-x-4 mb-2">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span>SSL Encrypted</span>
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span>PCI Compliant</span>
-                  </div>
-                  <p>Your payment information is safe and secure</p>
-                </div>
-              </div>
             </CardContent>
           </Card>
         </div>

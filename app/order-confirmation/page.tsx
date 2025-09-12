@@ -21,7 +21,6 @@ import {
   Clock,
   Share2,
   MapPin,
-  Globe,
   User
 } from "lucide-react";
 import { format } from "date-fns";
@@ -296,349 +295,338 @@ Phone: +91 9876543210
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        {/* Success Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-            <CheckCircle2 className="h-8 w-8 text-green-600" />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50/30 to-emerald-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Premium Success Header */}
+        <div className="text-center mb-12">
+          <div className="relative inline-flex items-center justify-center w-24 h-24 mb-6">
+            <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full opacity-20 animate-pulse"></div>
+            <div className="relative bg-gradient-to-r from-green-500 to-emerald-600 rounded-full w-20 h-20 flex items-center justify-center shadow-xl">
+              <CheckCircle2 className="h-10 w-10 text-white" />
+            </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Booking Confirmed!</h1>
-          <p className="text-lg text-gray-600">
-            Thank you for choosing Prime Travel. Your booking has been successfully processed.
+          <h1 className="text-5xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+            Booking Confirmed! 🎉
+          </h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Thank you for choosing Prime Travel. Your booking has been successfully processed and is being prepared for delivery.
           </p>
+          <div className="mt-6 inline-flex items-center px-6 py-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg border border-green-200">
+            <span className="text-sm font-medium text-green-700">Order ID:</span>
+            <span className="ml-2 font-mono text-lg font-bold text-green-800">{orderDetails.id}</span>
+          </div>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Order Details */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center">
-                  {getServiceIcon(orderDetails.serviceType)}
-                  <span className="ml-2">{getServiceName(orderDetails.serviceType)}</span>
-                </CardTitle>
-                <Badge variant="default" className="bg-green-600">
-                  <CheckCircle2 className="h-3 w-3 mr-1" />
-                  Confirmed
-                </Badge>
-              </div>
-              <CardDescription>
-                Order ID: <span className="font-mono text-blue-600">{orderDetails.id}</span>
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Service Description */}
-              <div className="p-4 bg-blue-50 rounded-lg">
-                <p className="text-blue-800">
-                  {getServiceDescription(orderDetails.serviceType)}
-                </p>
-              </div>
-
-              {/* Order Info */}
-              <div className="space-y-4">
-                <div className="flex items-center">
-                  <Calendar className="h-5 w-5 text-gray-500 mr-3" />
-                  <div>
-                    <div className="font-medium">Booking Date</div>
-                    <div className="text-sm text-gray-600">
-                      {format(new Date(orderDetails.createdAt), "PPP 'at' p")}
-                    </div>
-                  </div>
+        <div className="space-y-8">
+          {/* Premium Service Summary Card */}
+          <Card className="overflow-hidden shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
+            <CardContent className="p-0">
+              <div className="bg-gradient-to-r from-green-600 via-emerald-700 to-green-800 text-white p-8 relative overflow-hidden">
+                {/* Background Pattern */}
+                <div className="absolute inset-0 opacity-10">
+                  <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full transform translate-x-32 -translate-y-32"></div>
+                  <div className="absolute bottom-0 left-0 w-64 h-64 bg-white rounded-full transform -translate-x-20 translate-y-20"></div>
                 </div>
-
-                <div className="flex items-center">
-                  <Users className="h-5 w-5 text-gray-500 mr-3" />
-                  <div>
-                    <div className="font-medium">Number of Travelers</div>
-                    <div className="text-sm text-gray-600">
-                      {orderDetails.numberOfTravelers} traveler(s)
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center">
-                  <Clock className="h-5 w-5 text-gray-500 mr-3" />
-                  <div>
-                    <div className="font-medium">Processing Time</div>
-                    <div className="text-sm text-gray-600">
-                      5-15 minutes (expedited processing)
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Payment Details */}
-              <div className="space-y-3">
-                <h3 className="font-medium text-gray-900">Payment Summary</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span>Service Fee</span>
-                    <span>₹{Math.round(orderDetails.totalAmount * 0.85).toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Processing Fee</span>
-                    <span>₹{Math.round(orderDetails.totalAmount * 0.1).toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Taxes & Fees</span>
-                    <span>₹{Math.round(orderDetails.totalAmount * 0.05).toLocaleString()}</span>
-                  </div>
-                  <Separator />
-                  <div className="flex justify-between font-medium text-base">
-                    <span>Total Paid</span>
-                    <span>₹{orderDetails.totalAmount.toLocaleString()}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="space-y-3">
-                <Button 
-                  onClick={handleDownloadReceipt}
-                  disabled={isDownloading}
-                  className="w-full bg-blue-600 hover:bg-blue-700"
-                >
-                  {isDownloading ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                      Generating...
-                    </>
-                  ) : (
-                    <>
-                      <Download className="h-4 w-4 mr-2" />
-                      Download Receipt
-                    </>
-                  )}
-                </Button>
-                <Button 
-                  onClick={handleShareConfirmation}
-                  variant="outline" 
-                  className="w-full"
-                >
-                  <Share2 className="h-4 w-4 mr-2" />
-                  Share Confirmation
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Customer & Booking Details */}
-          <div className="space-y-6">
-            {/* Flight Booking Details */}
-            {orderDetails.flightBooking && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Plane className="h-5 w-5 mr-2 text-blue-600" />
-                    Flight Details
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <div className="text-sm text-gray-500">Route</div>
-                      <div className="font-medium flex items-center">
-                        <MapPin className="h-4 w-4 mr-1" />
-                        {orderDetails.flightBooking.departureAirport} → {orderDetails.flightBooking.arrivalAirport}
+                
+                <div className="relative z-10">
+                  <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8">
+                    <div className="flex items-center space-x-4 mb-6 lg:mb-0">
+                      <div className="bg-white/20 rounded-full p-4">
+                        {getServiceIcon(orderDetails.serviceType)}
+                      </div>
+                      <div>
+                        <h2 className="text-3xl font-bold mb-1">{getServiceName(orderDetails.serviceType)}</h2>
+                        <div className="flex items-center space-x-4">
+                          <div className="flex items-center bg-green-500/20 rounded-full px-3 py-1">
+                            <CheckCircle2 className="h-4 w-4 mr-2" />
+                            <span className="text-green-100 text-sm">Confirmed & Processing</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div>
-                      <div className="text-sm text-gray-500">Trip Type</div>
-                      <div className="font-medium capitalize">
-                        {orderDetails.flightBooking.tripType.replace("-", " ")}
+                    
+                    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center border border-white/20">
+                      <div className="text-4xl font-bold mb-2">
+                        ₹{orderDetails.totalAmount.toLocaleString()}
+                      </div>
+                      <div className="text-green-100 text-sm">
+                        {orderDetails.numberOfTravelers} Traveler{orderDetails.numberOfTravelers > 1 ? 's' : ''} • Paid
                       </div>
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <div className="text-sm text-gray-500">Departure Date</div>
-                      <div className="font-medium">
-                        {format(new Date(orderDetails.flightBooking.departureDate), "MMM dd, yyyy")}
+                  {/* Service Description */}
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-6 border border-white/20">
+                    <p className="text-green-100 text-lg leading-relaxed">
+                      {getServiceDescription(orderDetails.serviceType)}
+                    </p>
+                  </div>
+                  
+                  {/* Service Features */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                    <div className="flex items-center space-x-2">
+                      <CheckCircle2 className="h-4 w-4 text-green-300" />
+                      <span className="text-green-100">Instant confirmation</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Clock className="h-4 w-4 text-green-300" />
+                      <span className="text-green-100">5-15 min delivery</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Mail className="h-4 w-4 text-green-300" />
+                      <span className="text-green-100">Email delivery</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Phone className="h-4 w-4 text-green-300" />
+                      <span className="text-green-100">24/7 support</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Action Buttons Section */}
+              <div className="bg-gradient-to-r from-gray-50 to-white p-8">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <Button 
+                    onClick={handleDownloadReceipt}
+                    disabled={isDownloading}
+                    className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-6 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                  >
+                    {isDownloading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3" />
+                        Generating Receipt...
+                      </>
+                    ) : (
+                      <>
+                        <Download className="h-5 w-5 mr-3" />
+                        Download Receipt
+                      </>
+                    )}
+                  </Button>
+                  <Button 
+                    onClick={handleShareConfirmation}
+                    className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white py-6 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                  >
+                    <Share2 className="h-5 w-5 mr-3" />
+                    Share Confirmation
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Details Grid */}
+          <div className="grid lg:grid-cols-2 gap-8">
+
+            {/* Flight Booking Details */}
+            {orderDetails.flightBooking && (
+              <Card className="shadow-xl border-0 bg-white/90 backdrop-blur-sm">
+                <CardHeader className="bg-gradient-to-r from-blue-50 to-sky-50 border-b">
+                  <CardTitle className="flex items-center text-xl">
+                    <Plane className="h-6 w-6 mr-3 text-blue-600" />
+                    Flight Details
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-8 space-y-6">
+                  {/* Route Visualization */}
+                  <div className="bg-gradient-to-r from-blue-50 to-sky-50 rounded-xl p-6 border border-blue-200">
+                    <h4 className="text-lg font-bold text-gray-900 mb-4">Flight Route</h4>
+                    <div className="flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-blue-600">
+                          {orderDetails.flightBooking.departureAirport}
+                        </div>
+                        <div className="text-sm text-gray-600">Departure</div>
+                      </div>
+                      <div className="mx-8 flex items-center">
+                        <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
+                        <div className="h-px bg-blue-400 w-16"></div>
+                        <Plane className="h-6 w-6 text-blue-600 mx-2" />
+                        <div className="h-px bg-blue-400 w-16"></div>
+                        <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-blue-600">
+                          {orderDetails.flightBooking.arrivalAirport}
+                        </div>
+                        <div className="text-sm text-gray-600">Arrival</div>
                       </div>
                     </div>
+                  </div>
+                  
+                  {/* Flight Information Grid */}
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="bg-purple-50 rounded-xl p-5 border border-purple-200">
+                      <div className="text-sm text-purple-600 font-bold mb-2">Trip Type</div>
+                      <div className="text-lg font-bold text-gray-900 capitalize">
+                        {orderDetails.flightBooking.tripType.replace("-", " ")}
+                      </div>
+                    </div>
+                    
+                    <div className="bg-green-50 rounded-xl p-5 border border-green-200">
+                      <div className="text-sm text-green-600 font-bold mb-2">Travel Purpose</div>
+                      <div className="text-lg font-bold text-gray-900">{orderDetails.flightBooking.purpose}</div>
+                    </div>
+                  </div>
+                  
+                  {/* Travel Dates */}
+                  <div className="space-y-4">
+                    <div className="bg-orange-50 rounded-xl p-5 border border-orange-200">
+                      <div className="text-sm text-orange-600 font-bold mb-2">Departure Date</div>
+                      <div className="text-lg font-bold text-gray-900">
+                        {format(new Date(orderDetails.flightBooking.departureDate), "EEEE, MMMM dd, yyyy")}
+                      </div>
+                    </div>
+                    
                     {orderDetails.flightBooking.returnDate && (
-                      <div>
-                        <div className="text-sm text-gray-500">Return Date</div>
-                        <div className="font-medium">
-                          {format(new Date(orderDetails.flightBooking.returnDate), "MMM dd, yyyy")}
+                      <div className="bg-pink-50 rounded-xl p-5 border border-pink-200">
+                        <div className="text-sm text-pink-600 font-bold mb-2">Return Date</div>
+                        <div className="text-lg font-bold text-gray-900">
+                          {format(new Date(orderDetails.flightBooking.returnDate), "EEEE, MMMM dd, yyyy")}
                         </div>
                       </div>
                     )}
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <div className="text-sm text-gray-500">Purpose</div>
-                      <div className="font-medium">{orderDetails.flightBooking.purpose}</div>
-                    </div>
-                    <div>
-                      <div className="text-sm text-gray-500">Delivery</div>
-                      <div className="font-medium capitalize">{orderDetails.flightBooking.deliveryTiming}</div>
-                    </div>
-                  </div>
-                  
+                  {/* PNR Number (if available) */}
                   {orderDetails.flightBooking.pnrNumber && (
-                    <div className="p-3 bg-green-50 rounded-lg">
-                      <div className="text-sm text-gray-500">PNR Number</div>
-                      <div className="font-mono text-lg font-bold text-green-700">
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-300 rounded-xl p-6">
+                      <div className="flex items-center mb-3">
+                        <CheckCircle2 className="h-6 w-6 text-green-600 mr-3" />
+                        <span className="text-lg font-bold text-gray-900">PNR Number</span>
+                      </div>
+                      <div className="font-mono text-2xl font-bold text-green-700 tracking-wider">
                         {orderDetails.flightBooking.pnrNumber}
                       </div>
+                      <div className="text-sm text-green-600 mt-2">Use this PNR for check-in and boarding</div>
                     </div>
                   )}
                   
+                  {/* Special Requests */}
                   {orderDetails.flightBooking.specialRequests && (
-                    <div>
-                      <div className="text-sm text-gray-500">Special Requests</div>
-                      <div className="text-sm bg-gray-50 p-3 rounded-lg">
-                        {orderDetails.flightBooking.specialRequests}
-                      </div>
+                    <div className="bg-yellow-50 border border-yellow-300 rounded-xl p-5">
+                      <div className="text-sm text-yellow-600 font-bold mb-2">Special Requests</div>
+                      <div className="text-gray-700">{orderDetails.flightBooking.specialRequests}</div>
                     </div>
                   )}
-                </CardContent>
-              </Card>
-            )}
-            
-            {/* Travelers Details */}
-            {orderDetails.travelers && orderDetails.travelers.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Users className="h-5 w-5 mr-2 text-green-600" />
-                    Travelers ({orderDetails.travelers.length})
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {orderDetails.travelers.map((traveler, index) => (
-                      <div key={traveler.id} className="flex items-center p-3 bg-gray-50 rounded-lg">
-                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                          <User className="h-5 w-5 text-blue-600" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="font-medium">
-                            {traveler.title} {traveler.firstName} {traveler.lastName}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {traveler.isPrimary ? 'Primary Traveler' : 'Additional Traveler'}
-                          </div>
-                        </div>
-                        <div className="ml-auto">
-                          {traveler.isPrimary ? (
-                            <Badge variant="default" className="text-xs">Primary</Badge>
-                          ) : (
-                            <Badge variant="secondary" className="text-xs">Companion</Badge>
-                          )}
-                        </div>
-                      </div>
-                    ))}
+                  
+                  {/* Delivery Information */}
+                  <div className="bg-indigo-50 rounded-xl p-5 border border-indigo-200">
+                    <div className="text-sm text-indigo-600 font-bold mb-2">Document Delivery</div>
+                    <div className="text-lg font-bold text-gray-900 capitalize">
+                      {orderDetails.flightBooking.deliveryTiming}
+                    </div>
+                    <div className="text-sm text-gray-600 mt-1">via email to {orderDetails.customer.email}</div>
                   </div>
                 </CardContent>
               </Card>
             )}
             
-            {/* Customer Details */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <User className="h-5 w-5 mr-2 text-purple-600" />
-                  Customer Details
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3">
-                    <span className="font-medium text-purple-600">
-                      {orderDetails.customer.name?.charAt(0) || orderDetails.customer.email.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                  <div>
-                    <div className="font-medium">{orderDetails.customer.name || orderDetails.customer.email}</div>
-                    <div className="text-sm text-gray-600">Primary Contact</div>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-center">
-                    <Mail className="h-4 w-4 text-gray-500 mr-3" />
-                    <span className="text-sm">{orderDetails.customer.email}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Phone className="h-4 w-4 text-gray-500 mr-3" />
-                    <span className="text-sm">{orderDetails.customer.phone}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            
 
             {/* What's Next */}
-            <Card>
-              <CardHeader>
-                <CardTitle>What Happens Next?</CardTitle>
+            <Card className="shadow-xl border-0 bg-white/90 backdrop-blur-sm">
+              <CardHeader className="bg-gradient-to-r from-orange-50 to-yellow-50 border-b">
+                <CardTitle className="flex items-center text-xl">
+                  <Clock className="h-6 w-6 mr-3 text-orange-600" />
+                  What Happens Next?
+                </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-4">
+              <CardContent className="p-8">
+                <div className="space-y-6">
                   <div className="flex items-start">
-                    <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
-                      <span className="text-sm font-medium text-blue-600">1</span>
+                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4 mt-1">
+                      <CheckCircle2 className="h-6 w-6 text-green-600" />
                     </div>
-                    <div>
-                      <div className="font-medium">Processing Started</div>
-                      <div className="text-sm text-gray-600">Your booking is being processed by our team</div>
+                    <div className="flex-1">
+                      <div className="text-lg font-bold text-gray-900 mb-2">Processing Started</div>
+                      <div className="text-gray-600">Your booking is being processed by our expert team right now</div>
+                      <div className="mt-2 inline-flex items-center px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                        ✓ In Progress
+                      </div>
                     </div>
                   </div>
 
                   <div className="flex items-start">
-                    <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center mr-3 mt-0.5">
-                      <span className="text-sm font-medium text-gray-600">2</span>
+                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4 mt-1">
+                      <FileText className="h-6 w-6 text-blue-600" />
                     </div>
-                    <div>
-                      <div className="font-medium">Document Preparation</div>
-                      <div className="text-sm text-gray-600">Documents will be prepared within 5-15 minutes</div>
+                    <div className="flex-1">
+                      <div className="text-lg font-bold text-gray-900 mb-2">Document Preparation</div>
+                      <div className="text-gray-600">Your travel documents are being prepared and verified</div>
+                      <div className="mt-2 inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                        ⏳ 5-15 minutes
+                      </div>
                     </div>
                   </div>
 
                   <div className="flex items-start">
-                    <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center mr-3 mt-0.5">
-                      <span className="text-sm font-medium text-gray-600">3</span>
+                    <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4 mt-1">
+                      <Mail className="h-6 w-6 text-purple-600" />
                     </div>
-                    <div>
-                      <div className="font-medium">Email Delivery</div>
-                      <div className="text-sm text-gray-600">Documents sent to {orderDetails.customer.email}</div>
+                    <div className="flex-1">
+                      <div className="text-lg font-bold text-gray-900 mb-2">Email Delivery</div>
+                      <div className="text-gray-600">Documents will be sent to <span className="font-medium text-purple-600">{orderDetails.customer.email}</span></div>
+                      <div className="mt-2 inline-flex items-center px-3 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full">
+                        📧 Email Notification
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-6 p-4 bg-yellow-50 rounded-lg">
-                  <div className="flex items-center">
-                    <Clock className="h-5 w-5 text-yellow-600 mr-3" />
-                    <div className="text-sm">
-                      <div className="font-medium text-yellow-800">Estimated Delivery</div>
-                      <div className="text-yellow-600">Within 15 minutes to your email</div>
-                    </div>
+                <div className="mt-8 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-xl p-6">
+                  <div className="flex items-center mb-3">
+                    <Clock className="h-6 w-6 text-yellow-600 mr-3" />
+                    <span className="text-lg font-bold text-gray-900">Estimated Delivery</span>
                   </div>
+                  <div className="text-2xl font-bold text-yellow-700 mb-2">Within 15 Minutes</div>
+                  <div className="text-yellow-600">Check your email inbox and spam folder</div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Support */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Need Help?</CardTitle>
+            <Card className="shadow-xl border-0 bg-white/90 backdrop-blur-sm">
+              <CardHeader className="bg-gradient-to-r from-indigo-50 to-purple-50 border-b">
+                <CardTitle className="flex items-center text-xl">
+                  <Phone className="h-6 w-6 mr-3 text-indigo-600" />
+                  Need Help?
+                </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <Button variant="outline" className="w-full justify-start" onClick={() => router.push("/contact")}>
-                    <Phone className="h-4 w-4 mr-2" />
-                    Contact Support
+              <CardContent className="p-8">
+                <div className="space-y-4">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start h-14 text-lg bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 hover:bg-blue-100 transition-all duration-200" 
+                    onClick={() => router.push("/contact")}
+                  >
+                    <Phone className="h-5 w-5 mr-3 text-blue-600" />
+                    <div className="text-left">
+                      <div className="font-semibold text-gray-900">Contact Support</div>
+                      <div className="text-sm text-gray-600">Get help from our travel experts</div>
+                    </div>
                   </Button>
-                  <Button variant="outline" className="w-full justify-start" onClick={() => router.push("/")}>
-                    <Home className="h-4 w-4 mr-2" />
-                    Return Home
+                  
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start h-14 text-lg bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 hover:bg-green-100 transition-all duration-200" 
+                    onClick={() => router.push("/")}
+                  >
+                    <Home className="h-5 w-5 mr-3 text-green-600" />
+                    <div className="text-left">
+                      <div className="font-semibold text-gray-900">Return Home</div>
+                      <div className="text-sm text-gray-600">Explore more travel services</div>
+                    </div>
                   </Button>
+                  
+                  {/* Quick Contact Info */}
+                  <div className="mt-6 pt-6 border-t border-gray-200">
+                    <div className="text-center text-sm text-gray-600">
+                      <div className="mb-2">Emergency Support: <span className="font-semibold text-gray-900">+91 9876543210</span></div>
+                      <div>Email: <span className="font-semibold text-gray-900">support@primetravel.com</span></div>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
