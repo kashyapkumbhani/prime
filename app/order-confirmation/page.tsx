@@ -19,7 +19,10 @@ import {
   Home,
   FileText,
   Clock,
-  Share2
+  Share2,
+  MapPin,
+  Globe,
+  User
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -30,6 +33,19 @@ interface Traveler {
   lastName: string;
   dateOfBirth?: string;
   isPrimary: boolean;
+}
+
+interface FlightBooking {
+  id: number;
+  tripType: string;
+  departureAirport: string;
+  arrivalAirport: string;
+  departureDate: string;
+  returnDate?: string;
+  purpose: string;
+  specialRequests?: string;
+  deliveryTiming: string;
+  pnrNumber?: string;
 }
 
 interface OrderDetails {
@@ -46,6 +62,7 @@ interface OrderDetails {
   travelers: Traveler[];
   numberOfTravelers: number;
   paymentMethod?: string;
+  flightBooking?: FlightBooking;
 }
 
 function OrderConfirmationContent() {

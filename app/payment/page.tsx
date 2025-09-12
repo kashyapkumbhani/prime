@@ -20,8 +20,14 @@ import {
   ArrowLeft,
   Plane,
   Hotel,
-  Heart
+  Heart,
+  Users,
+  Calendar,
+  MapPin,
+  Clock,
+  Globe
 } from "lucide-react";
+import { format } from "date-fns";
 
 function PaymentContent() {
   const searchParams = useSearchParams();
@@ -43,7 +49,15 @@ function PaymentContent() {
     travelers: parseInt(searchParams.get("travelers") || "1"),
     customerName: "",
     customerEmail: "",
-    customerPhone: ""
+    customerPhone: "",
+    // Flight specific details
+    tripType: "",
+    departureAirport: null,
+    arrivalAirport: null,
+    departureDate: null,
+    returnDate: null,
+    purpose: "",
+    deliveryTiming: ""
   });
 
   useEffect(() => {
@@ -54,6 +68,16 @@ function PaymentContent() {
       setBookingDetails(prev => ({
         ...prev,
         ...bookingData
+      }));
+    }
+    
+    // Also try to get detailed form data from localStorage
+    const savedFormData = localStorage.getItem("flightFormData");
+    if (savedFormData) {
+      const formData = JSON.parse(savedFormData);
+      setBookingDetails(prev => ({
+        ...prev,
+        ...formData
       }));
     }
   }, []);
@@ -295,72 +319,215 @@ function PaymentContent() {
 
           {/* Order Summary */}
           <Card>
-            <CardHeader>
-              <CardTitle>Order Summary</CardTitle>
-              <CardDescription>Review your booking details</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Service Details */}
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div className="flex items-center space-x-3">
+            <CardContent className="p-0">
+              {/* Header Section */}
+              <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6">
+                <h2 className="text-2xl font-bold mb-2">Order Summary</h2>
+                <div className="flex items-center space-x-2 text-blue-100">
                   {getServiceIcon(bookingDetails.serviceType)}
-                  <div>
-                    <div className="font-medium">{getServiceName(bookingDetails.serviceType)}</div>
-                    <div className="text-sm text-gray-500">{bookingDetails.travelers} traveler(s)</div>
+                  <span className="text-lg font-medium">{getServiceName(bookingDetails.serviceType)}</span>
+                </div>
+                <p className="text-blue-100 text-sm mt-1">With Real PNR Number</p>
+              </div>
+
+              {/* Service Details */}
+              <div className="p-6 border-b">
+                <div className="text-center">
+                  <div className="text-4xl font-bold text-blue-600 mb-2">
+                    ₹{bookingDetails.amount.toLocaleString()}
+                  </div>
+                  <p className="text-gray-600">
+                    Total for {bookingDetails.travelers} traveler{bookingDetails.travelers > 1 ? 's' : ''}
+                  </p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    ₹999 per traveler
+                  </p>
+                </div>
+              </div>
+
+              {/* Trip Details Section */}
+              {(bookingDetails.departureAirport || bookingDetails.arrivalAirport) && (
+                <div className="p-6 bg-gray-50 border-b">
+                  <h3 className="font-semibold text-gray-900 mb-3">Trip Details</h3>
+                  <div className="space-y-3 text-sm">
+                    {bookingDetails.departureAirport && (
+                      <div className="flex items-center">
+                        <MapPin className="h-4 w-4 text-gray-500 mr-3" />
+                        <div>
+                          <span className="text-gray-500">From: </span>
+                          <span className="font-medium">
+                            {bookingDetails.departureAirport.city} ({bookingDetails.departureAirport.code})
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                    {bookingDetails.arrivalAirport && (
+                      <div className="flex items-center">
+                        <MapPin className="h-4 w-4 text-gray-500 mr-3" />
+                        <div>
+                          <span className="text-gray-500">To: </span>
+                          <span className="font-medium">
+                            {bookingDetails.arrivalAirport.city} ({bookingDetails.arrivalAirport.code})
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                    {bookingDetails.departureDate && (
+                      <div className="flex items-center">
+                        <Calendar className="h-4 w-4 text-gray-500 mr-3" />
+                        <div>
+                          <span className="text-gray-500">Departure: </span>
+                          <span className="font-medium">
+                            {format(new Date(bookingDetails.departureDate), "MMM dd, yyyy")}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                    {bookingDetails.tripType === "round-trip" && bookingDetails.returnDate && (
+                      <div className="flex items-center">
+                        <Calendar className="h-4 w-4 text-gray-500 mr-3" />
+                        <div>
+                          <span className="text-gray-500">Return: </span>
+                          <span className="font-medium">
+                            {format(new Date(bookingDetails.returnDate), "MMM dd, yyyy")}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                    {bookingDetails.tripType && (
+                      <div className="flex items-center">
+                        <Plane className="h-4 w-4 text-gray-500 mr-3" />
+                        <div>
+                          <span className="text-gray-500">Trip Type: </span>
+                          <span className="font-medium capitalize">{bookingDetails.tripType.replace("-", " ")}</span>
+                        </div>
+                      </div>
+                    )}
+                    {bookingDetails.purpose && (
+                      <div className="flex items-center">
+                        <CheckCircle className="h-4 w-4 text-gray-500 mr-3" />
+                        <div>
+                          <span className="text-gray-500">Purpose: </span>
+                          <span className="font-medium">{bookingDetails.purpose}</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
-                <Badge variant="outline">Premium</Badge>
+              )}
+
+              {/* Customer Details */}
+              {(bookingDetails.customerName || bookingDetails.customerEmail) && (
+                <div className="p-6 border-b">
+                  <h3 className="font-semibold text-gray-900 mb-3">Customer Details</h3>
+                  <div className="space-y-2 text-sm">
+                    {bookingDetails.customerName && (
+                      <div>
+                        <span className="text-gray-500">Name: </span>
+                        <span className="font-medium">{bookingDetails.customerName}</span>
+                      </div>
+                    )}
+                    {bookingDetails.customerEmail && (
+                      <div>
+                        <span className="text-gray-500">Email: </span>
+                        <span className="font-medium">{bookingDetails.customerEmail}</span>
+                      </div>
+                    )}
+                    {bookingDetails.customerPhone && (
+                      <div>
+                        <span className="text-gray-500">Phone: </span>
+                        <span className="font-medium">{bookingDetails.customerPhone}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Features Section */}
+              <div className="p-6 space-y-4 border-b">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                    <CheckCircle className="w-5 h-5 text-green-600" />
+                  </div>
+                  <span className="text-sm font-medium">Real PNR number included</span>
+                </div>
+                
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <Clock className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <span className="text-sm font-medium">Delivered in 15-30 minutes</span>
+                </div>
+                
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                    <CheckCircle className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <span className="text-sm font-medium">Embassy-approved format</span>
+                </div>
+                
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                    <Globe className="w-5 h-5 text-orange-600" />
+                  </div>
+                  <span className="text-sm font-medium">Worldwide acceptance</span>
+                </div>
               </div>
 
               {/* Pricing Breakdown */}
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span>Service Fee</span>
-                  <span>₹{(bookingDetails.amount * 0.85).toFixed(0)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Processing Fee</span>
-                  <span>₹{(bookingDetails.amount * 0.1).toFixed(0)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Taxes & Fees</span>
-                  <span>₹{(bookingDetails.amount * 0.05).toFixed(0)}</span>
-                </div>
-                <Separator />
-                <div className="flex justify-between text-lg font-semibold">
-                  <span>Total Amount</span>
-                  <span>₹{bookingDetails.amount.toLocaleString()}</span>
+              <div className="p-6 border-b">
+                <h3 className="font-semibold text-gray-900 mb-3">Payment Breakdown</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between text-sm">
+                    <span>Service Fee</span>
+                    <span>₹{(bookingDetails.amount * 0.85).toFixed(0)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Processing Fee</span>
+                    <span>₹{(bookingDetails.amount * 0.1).toFixed(0)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Taxes & Fees</span>
+                    <span>₹{(bookingDetails.amount * 0.05).toFixed(0)}</span>
+                  </div>
+                  <Separator />
+                  <div className="flex justify-between text-lg font-semibold">
+                    <span>Total Amount</span>
+                    <span>₹{bookingDetails.amount.toLocaleString()}</span>
+                  </div>
                 </div>
               </div>
 
               {/* Payment Button */}
-              <Button
-                onClick={handlePayment}
-                disabled={isProcessing}
-                className="w-full bg-blue-600 hover:bg-blue-700 py-3 text-lg"
-              >
-                {isProcessing ? (
-                  <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
-                    Processing Payment...
-                  </>
-                ) : (
-                  <>
-                    <Lock className="h-5 w-5 mr-2" />
-                    Pay ₹{bookingDetails.amount.toLocaleString()}
-                  </>
-                )}
-              </Button>
+              <div className="p-6">
+                <Button
+                  onClick={handlePayment}
+                  disabled={isProcessing}
+                  className="w-full bg-blue-600 hover:bg-blue-700 py-3 text-lg mb-4"
+                >
+                  {isProcessing ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
+                      Processing Payment...
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="h-5 w-5 mr-2" />
+                      Pay ₹{bookingDetails.amount.toLocaleString()}
+                    </>
+                  )}
+                </Button>
 
-              {/* Trust Indicators */}
-              <div className="text-center text-sm text-gray-500">
-                <div className="flex items-center justify-center space-x-4 mb-2">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                  <span>SSL Encrypted</span>
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                  <span>PCI Compliant</span>
+                {/* Trust Indicators */}
+                <div className="text-center text-sm text-gray-500">
+                  <div className="flex items-center justify-center space-x-4 mb-2">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <span>SSL Encrypted</span>
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <span>PCI Compliant</span>
+                  </div>
+                  <p>Your payment information is safe and secure</p>
                 </div>
-                <p>Your payment information is safe and secure</p>
               </div>
             </CardContent>
           </Card>
