@@ -38,8 +38,15 @@ function PaymentContent() {
     arrivalAirport: null as { name: string; city: string; country: string; code: string } | null,
     departureDate: null as Date | null,
     returnDate: null as Date | null,
+    // Hotel specific details
+    destinationCity: "",
+    checkInDate: null as Date | null,
+    checkOutDate: null as Date | null,
+    numberOfHotels: 1,
+    // Common details
     purpose: "",
     deliveryTiming: "",
+    deliveryDate: null as Date | null,
     // Traveler details
     primaryTraveler: null as { title: string; firstName: string; lastName: string } | null,
     additionalTravelers: [] as { title: string; firstName: string; lastName: string }[],
@@ -62,12 +69,14 @@ function PaymentContent() {
       }
     }
     
-    // Also try to get detailed form data from localStorage
-    const savedFormData = localStorage.getItem("flightFormData");
+    // Also try to get detailed form data from localStorage based on service type
+    const serviceType = searchParams.get("service") || "flight-reservation";
+    const formDataKey = serviceType === "hotel-booking" ? "hotelFormData" : "flightFormData";
+    const savedFormData = localStorage.getItem(formDataKey);
     if (savedFormData) {
       try {
         const formData = JSON.parse(savedFormData);
-        console.log("Flight form data from localStorage:", formData);
+        console.log(`${serviceType} form data from localStorage:`, formData);
         setBookingDetails(prev => ({
           ...prev,
           ...formData
@@ -143,16 +152,28 @@ function PaymentContent() {
         totalAmount: bookingDetails.amount,
         paymentMethod: "card",
         status: "COMPLETED",
-        // Include flight reservation details
+        // Common traveler details
         primaryTraveler: bookingDetails.primaryTraveler,
         additionalTravelers: bookingDetails.additionalTravelers,
-        tripType: bookingDetails.tripType,
-        departureAirport: bookingDetails.departureAirport,
-        arrivalAirport: bookingDetails.arrivalAirport,
-        departureDate: bookingDetails.departureDate,
-        returnDate: bookingDetails.returnDate,
+        // Flight reservation specific details
+        ...(bookingDetails.serviceType === "flight-reservation" && {
+          tripType: bookingDetails.tripType,
+          departureAirport: bookingDetails.departureAirport,
+          arrivalAirport: bookingDetails.arrivalAirport,
+          departureDate: bookingDetails.departureDate,
+          returnDate: bookingDetails.returnDate,
+        }),
+        // Hotel booking specific details
+        ...(bookingDetails.serviceType === "hotel-booking" && {
+          destinationCity: bookingDetails.destinationCity,
+          checkInDate: bookingDetails.checkInDate,
+          checkOutDate: bookingDetails.checkOutDate,
+          numberOfHotels: bookingDetails.numberOfHotels,
+        }),
+        // Common fields
         purpose: bookingDetails.purpose,
         deliveryTiming: bookingDetails.deliveryTiming,
+        deliveryDate: bookingDetails.deliveryDate,
         specialRequest: bookingDetails.specialRequest
       };
 
@@ -221,7 +242,10 @@ function PaymentContent() {
                         <h2 className="text-3xl font-bold mb-1">{getServiceName(bookingDetails.serviceType)}</h2>
                         <p className="text-blue-100 flex items-center">
                           <CheckCircle className="h-4 w-4 mr-2" />
-                          With Real PNR Number • Embassy Approved
+                          {bookingDetails.serviceType === "hotel-booking" ? 
+                            "Real Hotel Confirmation • Embassy Approved" : 
+                            "With Real PNR Number • Embassy Approved"
+                          }
                         </p>
                         {/* Lead Passenger Info */}
                         {bookingDetails.primaryTraveler && (
@@ -240,7 +264,7 @@ function PaymentContent() {
                         ₹{bookingDetails.amount.toLocaleString()}
                       </div>
                       <div className="text-blue-100 text-sm">
-                        {bookingDetails.travelers} Traveler{bookingDetails.travelers > 1 ? 's' : ''} • ₹999 each
+                        {bookingDetails.travelers} Traveler{bookingDetails.travelers > 1 ? 's' : ''} • ₹{bookingDetails.serviceType === "hotel-booking" ? "799" : "999"} each
                       </div>
                     </div>
                   </div>
@@ -248,119 +272,246 @@ function PaymentContent() {
                   {/* Enhanced Trip Route Visual with More Details */}
                   <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-6 border border-white/20">
                     <div className="mb-4">
-                      <h3 className="text-lg font-bold text-white mb-2">Travel Details</h3>
+                      <h3 className="text-lg font-bold text-white mb-2">
+                        {bookingDetails.serviceType === "hotel-booking" ? "Hotel Booking Details" : "Travel Details"}
+                      </h3>
                     </div>
                     
-                    {/* Route Information - Always show the flight path */}
-                    <div className="flex flex-col md:flex-row items-center justify-between mb-4">
-                      {/* Departure */}
-                      <div className="text-center mb-4 md:mb-0">
-                        <div className="text-2xl font-bold mb-1">
-                          {bookingDetails.departureAirport?.code || "DEP"}
+                    {bookingDetails.serviceType === "hotel-booking" ? (
+                      /* Hotel Booking Information */
+                      <div className="space-y-4">
+                        {/* Hotel Information */}
+                        <div className="text-center">
+                          <div className="flex items-center justify-center mb-4">
+                            <Hotel className="h-12 w-12 text-white bg-white/20 rounded-full p-3" />
+                          </div>
+                          <div className="text-2xl font-bold mb-2">
+                            {bookingDetails.destinationCity || "Hotel Destination"}
+                          </div>
+                          <div className="text-blue-100 text-sm">
+                            {bookingDetails.numberOfHotels || 1} Hotel{(bookingDetails.numberOfHotels || 1) > 1 ? 's' : ''} Reserved
+                          </div>
                         </div>
-                        <div className="text-blue-100 text-sm font-medium">
-                          {bookingDetails.departureAirport?.city || "Departure City"}
-                        </div>
-                        <div className="text-xs text-blue-200">
-                          {bookingDetails.departureAirport?.name || "International Airport"}
-                        </div>
-                        <div className="text-xs text-blue-200 mt-1 bg-white/10 rounded px-2 py-1">
-                          {(() => {
-                            if (bookingDetails.departureDate) {
-                              try {
-                                const date = new Date(bookingDetails.departureDate);
-                                if (date.toString() !== 'Invalid Date') {
-                                  return `Depart: ${format(date, "MMM dd, yyyy")}`;
-                                }
-                              } catch (e) {
-                                console.log("Date parsing error:", e, bookingDetails.departureDate);
-                              }
-                            }
-                            return "Departure Date: TBD";
-                          })()} 
-                        </div>
-                      </div>
-                      
-                      {/* Flight Path */}
-                      <div className="flex-1 flex items-center justify-center mb-4 md:mb-0">
-                        <div className="flex items-center space-x-2">
-                          <div className="w-3 h-3 bg-white rounded-full"></div>
-                          <div className="h-px bg-white/40 w-16 md:w-32"></div>
-                          <Plane className="h-6 w-6 text-white" />
-                          <div className="h-px bg-white/40 w-16 md:w-32"></div>
-                          <div className="w-3 h-3 bg-white rounded-full"></div>
-                        </div>
-                      </div>
-                      
-                      {/* Arrival */}
-                      <div className="text-center">
-                        <div className="text-2xl font-bold mb-1">
-                          {bookingDetails.arrivalAirport?.code || "ARR"}
-                        </div>
-                        <div className="text-blue-100 text-sm font-medium">
-                          {bookingDetails.arrivalAirport?.city || "Arrival City"}
-                        </div>
-                        <div className="text-xs text-blue-200">
-                          {bookingDetails.arrivalAirport?.name || "International Airport"}
-                        </div>
-                        {bookingDetails.tripType === "round-trip" && (
-                          <div className="text-xs text-blue-200 mt-1 bg-white/10 rounded px-2 py-1">
-                            {(() => {
-                              if (bookingDetails.returnDate) {
-                                try {
-                                  const date = new Date(bookingDetails.returnDate);
-                                  if (date.toString() !== 'Invalid Date') {
-                                    return `Return: ${format(date, "MMM dd, yyyy")}`;
+                        
+                        {/* Check-in and Check-out Dates */}
+                        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                          <div className="text-center bg-white/10 rounded-lg p-4 flex-1">
+                            <div className="text-blue-200 text-sm mb-1">Check-in Date</div>
+                            <div className="text-white font-semibold">
+                              {(() => {
+                                if (bookingDetails.checkInDate) {
+                                  try {
+                                    const date = new Date(bookingDetails.checkInDate);
+                                    if (date.toString() !== 'Invalid Date') {
+                                      return format(date, "MMM dd, yyyy");
+                                    }
+                                  } catch (e) {
+                                    console.log("Check-in date parsing error:", e, bookingDetails.checkInDate);
                                   }
-                                } catch (e) {
-                                  console.log("Return date parsing error:", e, bookingDetails.returnDate);
                                 }
-                              }
-                              return "Return Date: TBD";
-                            })()}
+                                return "Date TBD";
+                              })()} 
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center">
+                            <div className="h-px bg-white/40 w-16 md:w-32"></div>
+                            <Hotel className="h-6 w-6 text-white mx-4" />
+                            <div className="h-px bg-white/40 w-16 md:w-32"></div>
+                          </div>
+                          
+                          <div className="text-center bg-white/10 rounded-lg p-4 flex-1">
+                            <div className="text-blue-200 text-sm mb-1">Check-out Date</div>
+                            <div className="text-white font-semibold">
+                              {(() => {
+                                if (bookingDetails.checkOutDate) {
+                                  try {
+                                    const date = new Date(bookingDetails.checkOutDate);
+                                    if (date.toString() !== 'Invalid Date') {
+                                      return format(date, "MMM dd, yyyy");
+                                    }
+                                  } catch (e) {
+                                    console.log("Check-out date parsing error:", e, bookingDetails.checkOutDate);
+                                  }
+                                }
+                                return "Date TBD";
+                              })()} 
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Duration calculation for hotels */}
+                        {bookingDetails.checkInDate && bookingDetails.checkOutDate && (
+                          <div className="text-center">
+                            <div className="text-blue-200 text-sm">Duration</div>
+                            <div className="text-white font-bold text-lg">
+                              {(() => {
+                                try {
+                                  const checkIn = new Date(bookingDetails.checkInDate);
+                                  const checkOut = new Date(bookingDetails.checkOutDate);
+                                  const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 3600 * 24));
+                                  return `${nights} night${nights > 1 ? 's' : ''}`;
+                                } catch {
+                                  return "Duration TBD";
+                                }
+                              })()} 
+                            </div>
                           </div>
                         )}
                       </div>
-                    </div>
+                    ) : (
+                      /* Flight Route Information - Always show the flight path */
+                      <div>
+                        <div className="flex flex-col md:flex-row items-center justify-between mb-4">
+                          {/* Departure */}
+                          <div className="text-center mb-4 md:mb-0">
+                            <div className="text-2xl font-bold mb-1">
+                              {bookingDetails.departureAirport?.code || "DEP"}
+                            </div>
+                            <div className="text-blue-100 text-sm font-medium">
+                              {bookingDetails.departureAirport?.city || "Departure City"}
+                            </div>
+                            <div className="text-xs text-blue-200">
+                              {bookingDetails.departureAirport?.name || "International Airport"}
+                            </div>
+                            <div className="text-xs text-blue-200 mt-1 bg-white/10 rounded px-2 py-1">
+                              {(() => {
+                                if (bookingDetails.departureDate) {
+                                  try {
+                                    const date = new Date(bookingDetails.departureDate);
+                                    if (date.toString() !== 'Invalid Date') {
+                                      return `Depart: ${format(date, "MMM dd, yyyy")}`;
+                                    }
+                                  } catch (e) {
+                                    console.log("Date parsing error:", e, bookingDetails.departureDate);
+                                  }
+                                }
+                                return "Departure Date: TBD";
+                              })()} 
+                            </div>
+                          </div>
+                          
+                          {/* Flight Path */}
+                          <div className="flex-1 flex items-center justify-center mb-4 md:mb-0">
+                            <div className="flex items-center space-x-2">
+                              <div className="w-3 h-3 bg-white rounded-full"></div>
+                              <div className="h-px bg-white/40 w-16 md:w-32"></div>
+                              <Plane className="h-6 w-6 text-white" />
+                              <div className="h-px bg-white/40 w-16 md:w-32"></div>
+                              <div className="w-3 h-3 bg-white rounded-full"></div>
+                            </div>
+                          </div>
+                          
+                          {/* Arrival */}
+                          <div className="text-center">
+                            <div className="text-2xl font-bold mb-1">
+                              {bookingDetails.arrivalAirport?.code || "ARR"}
+                            </div>
+                            <div className="text-blue-100 text-sm font-medium">
+                              {bookingDetails.arrivalAirport?.city || "Arrival City"}
+                            </div>
+                            <div className="text-xs text-blue-200">
+                              {bookingDetails.arrivalAirport?.name || "International Airport"}
+                            </div>
+                            {bookingDetails.tripType === "round-trip" && (
+                              <div className="text-xs text-blue-200 mt-1 bg-white/10 rounded px-2 py-1">
+                                {(() => {
+                                  if (bookingDetails.returnDate) {
+                                    try {
+                                      const date = new Date(bookingDetails.returnDate);
+                                      if (date.toString() !== 'Invalid Date') {
+                                        return `Return: ${format(date, "MMM dd, yyyy")}`;
+                                      }
+                                    } catch (e) {
+                                      console.log("Return date parsing error:", e, bookingDetails.returnDate);
+                                    }
+                                  }
+                                  return "Return Date: TBD";
+                                })()} 
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                     
-                    {/* Additional Travel Info - Always show available data */}
+                    {/* Additional Travel Info - Service-specific data */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-                      <div className="bg-white/5 rounded-lg p-3 text-center">
-                        <div className="text-blue-200 mb-1">Trip Type</div>
-                        <div className="text-white font-semibold capitalize">
-                          {bookingDetails.tripType ? bookingDetails.tripType.replace("-", " ") : "One Way"}
-                        </div>
-                      </div>
-                      
-                      <div className="bg-white/5 rounded-lg p-3 text-center">
-                        <div className="text-blue-200 mb-1">Purpose</div>
-                        <div className="text-white font-semibold">
-                          {bookingDetails.purpose || "Business"}
-                        </div>
-                      </div>
-                      
-                      <div className="bg-white/5 rounded-lg p-3 text-center">
-                        <div className="text-blue-200 mb-1">Passengers</div>
-                        <div className="text-white font-semibold">
-                          {bookingDetails.travelers} Traveler{bookingDetails.travelers > 1 ? 's' : ''}
-                        </div>
-                      </div>
-                      
-                      <div className="bg-white/5 rounded-lg p-3 text-center">
-                        <div className="text-blue-200 mb-1">Delivery</div>
-                        <div className="text-white font-semibold">
-                          {bookingDetails.deliveryTiming || "15-30 min"}
-                        </div>
-                      </div>
+                      {bookingDetails.serviceType === "hotel-booking" ? (
+                        <>
+                          <div className="bg-white/5 rounded-lg p-3 text-center">
+                            <div className="text-blue-200 mb-1">Destination</div>
+                            <div className="text-white font-semibold">
+                              {bookingDetails.destinationCity || "TBD"}
+                            </div>
+                          </div>
+                          
+                          <div className="bg-white/5 rounded-lg p-3 text-center">
+                            <div className="text-blue-200 mb-1">Hotels</div>
+                            <div className="text-white font-semibold">
+                              {bookingDetails.numberOfHotels || 1} Hotel{(bookingDetails.numberOfHotels || 1) > 1 ? 's' : ''}
+                            </div>
+                          </div>
+                          
+                          <div className="bg-white/5 rounded-lg p-3 text-center">
+                            <div className="text-blue-200 mb-1">Travelers</div>
+                            <div className="text-white font-semibold">
+                              {bookingDetails.travelers} Guest{bookingDetails.travelers > 1 ? 's' : ''}
+                            </div>
+                          </div>
+                          
+                          <div className="bg-white/5 rounded-lg p-3 text-center">
+                            <div className="text-blue-200 mb-1">Delivery</div>
+                            <div className="text-white font-semibold">
+                              {bookingDetails.deliveryTiming === "immediate" ? "20-60 min" : "Later date"}
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="bg-white/5 rounded-lg p-3 text-center">
+                            <div className="text-blue-200 mb-1">Trip Type</div>
+                            <div className="text-white font-semibold capitalize">
+                              {bookingDetails.tripType ? bookingDetails.tripType.replace("-", " ") : "One Way"}
+                            </div>
+                          </div>
+                          
+                          <div className="bg-white/5 rounded-lg p-3 text-center">
+                            <div className="text-blue-200 mb-1">Purpose</div>
+                            <div className="text-white font-semibold">
+                              {bookingDetails.purpose || "Business"}
+                            </div>
+                          </div>
+                          
+                          <div className="bg-white/5 rounded-lg p-3 text-center">
+                            <div className="text-blue-200 mb-1">Passengers</div>
+                            <div className="text-white font-semibold">
+                              {bookingDetails.travelers} Traveler{bookingDetails.travelers > 1 ? 's' : ''}
+                            </div>
+                          </div>
+                          
+                          <div className="bg-white/5 rounded-lg p-3 text-center">
+                            <div className="text-blue-200 mb-1">Delivery</div>
+                            <div className="text-white font-semibold">
+                              {bookingDetails.deliveryTiming || "15-30 min"}
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </div>
                     
                     {/* Data Source Indicator */}
                     <div className="mt-4 text-center">
                       <div className="text-xs text-blue-300">
-                        {bookingDetails.departureAirport && bookingDetails.arrivalAirport ? 
-                          "✓ Flight details loaded from booking form" : 
-                          "⚠ Using sample data - complete booking form for actual details"
-                        }
+                        {bookingDetails.serviceType === "hotel-booking" ? (
+                          bookingDetails.destinationCity && bookingDetails.checkInDate ? 
+                            "✓ Hotel booking details loaded from form" : 
+                            "⚠ Using sample data - complete booking form for actual details"
+                        ) : (
+                          bookingDetails.departureAirport && bookingDetails.arrivalAirport ? 
+                            "✓ Flight details loaded from booking form" : 
+                            "⚠ Using sample data - complete booking form for actual details"
+                        )}
                       </div>
                     </div>
                     
@@ -369,22 +520,45 @@ function PaymentContent() {
                   
                   {/* Service Features */}
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-                    <div className="flex items-center space-x-2">
-                      <CheckCircle className="h-4 w-4 text-green-300" />
-                      <span className="text-blue-100">Real PNR included</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Clock className="h-4 w-4 text-green-300" />
-                      <span className="text-blue-100">15-30 min delivery</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Shield className="h-4 w-4 text-green-300" />
-                      <span className="text-blue-100">Embassy approved</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Globe className="h-4 w-4 text-green-300" />
-                      <span className="text-blue-100">Worldwide accepted</span>
-                    </div>
+                    {bookingDetails.serviceType === "hotel-booking" ? (
+                      <>
+                        <div className="flex items-center space-x-2">
+                          <CheckCircle className="h-4 w-4 text-green-300" />
+                          <span className="text-blue-100">Real hotel confirmation</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Clock className="h-4 w-4 text-green-300" />
+                          <span className="text-blue-100">20-60 min delivery</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Shield className="h-4 w-4 text-green-300" />
+                          <span className="text-blue-100">Embassy approved</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Globe className="h-4 w-4 text-green-300" />
+                          <span className="text-blue-100">Worldwide accepted</span>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex items-center space-x-2">
+                          <CheckCircle className="h-4 w-4 text-green-300" />
+                          <span className="text-blue-100">Real PNR included</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Clock className="h-4 w-4 text-green-300" />
+                          <span className="text-blue-100">15-30 min delivery</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Shield className="h-4 w-4 text-green-300" />
+                          <span className="text-blue-100">Embassy approved</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Globe className="h-4 w-4 text-green-300" />
+                          <span className="text-blue-100">Worldwide accepted</span>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>

@@ -145,8 +145,8 @@ function OrderConfirmationContent() {
     try {
       // Create receipt content
       const receiptContent = `
-PRIME TRAVEL - BOOKING RECEIPT
-===============================
+PRIMEDUMMYTICKET - BOOKING RECEIPT
+==================================
 
 Order ID: ${orderDetails.id}
 Booking Date: ${format(new Date(orderDetails.createdAt), "PPP 'at' p")}
@@ -167,10 +167,13 @@ Payment Summary:
 - Taxes & Fees: ₹${Math.round(orderDetails.totalAmount * 0.05).toLocaleString()}
 - Total Paid: ₹${orderDetails.totalAmount.toLocaleString()}
 
-Thank you for choosing Prime Travel!
+Thank you for choosing PrimeDummyTicket!
 
-For support, contact: support@primetravel.com
-Phone: +91 9876543210
+For support:
+- WhatsApp (Fastest): +91 93161 05685
+- Email: primedummyticket@gmail.com
+- Phone: +91 93161 05685
+- Website: https://primedummyticket.com
       `.trim();
 
       // Create and download file
@@ -178,7 +181,7 @@ Phone: +91 9876543210
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `Prime-Travel-Receipt-${orderDetails.id}.txt`;
+      link.download = `PrimeDummyTicket-Receipt-${orderDetails.id}.txt`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -198,7 +201,7 @@ Phone: +91 9876543210
   const handleShareConfirmation = async () => {
     if (!orderDetails) return;
     
-    const shareText = `🎉 Booking Confirmed with Prime Travel!\n\nOrder ID: ${orderDetails.id}\nService: ${getServiceName(orderDetails.serviceType)}\nTravelers: ${orderDetails.numberOfTravelers}\nAmount: ₹${orderDetails.totalAmount.toLocaleString()}\n\nThank you for choosing Prime Travel! 🛫✈️\n\nFor support: +91 9876543210`;
+    const shareText = `🎉 Booking Confirmed with PrimeDummyTicket!\n\nOrder ID: ${orderDetails.id}\nService: ${getServiceName(orderDetails.serviceType)}\nTravelers: ${orderDetails.numberOfTravelers}\nAmount: ₹${orderDetails.totalAmount.toLocaleString()}\n\nThank you for choosing PrimeDummyTicket! 🛫✈️\n\nFor support: +91 93161 05685 (WhatsApp)`;
     
     const shareUrl = window.location.href;
     
@@ -206,7 +209,7 @@ Phone: +91 9876543210
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Prime Travel - Booking Confirmation',
+          title: 'PrimeDummyTicket - Booking Confirmation',
           text: shareText,
           url: shareUrl
         });
@@ -303,7 +306,7 @@ Phone: +91 9876543210
             Booking Confirmed! 🎉
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Thank you for choosing Prime Travel. Your booking has been successfully processed and is being prepared for delivery.
+            Thank you for choosing PrimeDummyTicket. Your booking has been successfully processed and is being prepared for delivery.
           </p>
           <div className="mt-6 inline-flex items-center px-6 py-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg border border-green-200">
             <span className="text-sm font-medium text-green-700">Order ID:</span>
@@ -617,8 +620,10 @@ Phone: +91 9876543210
                   {/* Quick Contact Info */}
                   <div className="mt-6 pt-6 border-t border-gray-200">
                     <div className="text-center text-sm text-gray-600">
-                      <div className="mb-2">Emergency Support: <span className="font-semibold text-gray-900">+91 9876543210</span></div>
-                      <div>Email: <span className="font-semibold text-gray-900">support@primetravel.com</span></div>
+                      <div className="mb-2">WhatsApp Support: <span className="font-semibold text-green-600">+91 93161 05685</span></div>
+                      <div className="mb-2">Emergency Phone: <span className="font-semibold text-gray-900">+91 93161 05685</span></div>
+                      <div>Email: <span className="font-semibold text-gray-900">primedummyticket@gmail.com</span></div>
+                      <div className="mt-2">24/7 Support • Avg response: 30 minutes</div>
                     </div>
                   </div>
                 </div>

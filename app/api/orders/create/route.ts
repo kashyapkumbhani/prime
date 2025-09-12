@@ -18,13 +18,21 @@ export async function POST(request: NextRequest) {
       status = 'PENDING',
       primaryTraveler,
       additionalTravelers,
+      // Flight booking specific fields
       tripType,
       departureAirport,
       arrivalAirport,
       departureDate,
       returnDate,
+      // Hotel booking specific fields
+      destinationCity,
+      checkInDate,
+      checkOutDate,
+      numberOfHotels,
+      // Common fields
       purpose,
       deliveryTiming,
+      deliveryDate,
       specialRequest
     } = orderData;
 
@@ -127,6 +135,24 @@ export async function POST(request: NextRequest) {
           deliveryTiming: deliveryTiming || 'now'
         }
       });
+    }
+    
+    // Create hotel booking if it's a hotel booking
+    if (serviceTypeEnum === 'HOTEL_BOOKING' && destinationCity && checkInDate && checkOutDate) {
+      await prisma.hotelBooking.create({
+        data: {
+          orderId: order.id,
+          destinationCity,
+          checkInDate: new Date(checkInDate),
+          checkOutDate: new Date(checkOutDate),
+          numberOfRooms: numberOfHotels || 1,
+          numberOfGuests: numberOfTravelers,
+          purpose: purpose || 'Visa Submission / Application',
+          specialRequests: specialRequest
+        }
+      });
+      
+      console.log('Hotel booking created successfully for order:', order.id);
     }
 
     return NextResponse.json({

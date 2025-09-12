@@ -35,7 +35,7 @@ const Navigation = () => {
               <Plane className="h-4 w-4" />
             </div>
             <span className="hidden font-bold text-xl text-gray-900 sm:inline-block">
-              DummyTicket
+              PrimeDummyTicket
             </span>
           </Link>
 

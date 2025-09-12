@@ -15,8 +15,23 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DummyTicket - Professional Visa Document Services",
-  description: "Get embassy-approved flight reservations, hotel bookings, and travel insurance for visa applications. Delivered within 15-30 minutes with real PNR numbers.",
+  title: "PrimeDummyTicket - Professional Visa Document Services",
+  description: "Get embassy-approved flight reservations, hotel bookings, and travel insurance for visa applications. Delivered within 15-30 minutes with real PNR numbers from PrimeDummyTicket.com.",
+  keywords: "dummy ticket, flight reservation, hotel booking, travel insurance, visa application, PNR number, embassy approved",
+  authors: [{ name: "PrimeDummyTicket", url: "https://primedummyticket.com" }],
+  creator: "PrimeDummyTicket",
+  publisher: "PrimeDummyTicket",
+  metadataBase: new URL('https://primedummyticket.com'),
+  alternates: {
+    canonical: 'https://primedummyticket.com'
+  },
+  openGraph: {
+    title: "PrimeDummyTicket - Professional Visa Document Services",
+    description: "Get embassy-approved flight reservations, hotel bookings, and travel insurance for visa applications. Delivered within 15-30 minutes.",
+    url: "https://primedummyticket.com",
+    siteName: "PrimeDummyTicket",
+    type: "website"
+  }
 };
 
 export default function RootLayout({

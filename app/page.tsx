@@ -72,7 +72,7 @@ export default function Home() {
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
               Get embassy-approved flight reservations, hotel bookings, and travel insurance 
-              for your visa applications. Delivered fast with real PNR numbers.
+              for your visa applications from PrimeDummyTicket. Delivered fast with real PNR numbers.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
               <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 text-lg" asChild>
@@ -185,7 +185,7 @@ export default function Home() {
             Ready to Get Your Visa Documents?
           </h2>
           <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Join thousands of satisfied customers who trust us for their visa documentation needs.
+            Join thousands of satisfied customers who trust PrimeDummyTicket for their visa documentation needs.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" className="px-8 py-6 text-lg bg-white text-blue-600 hover:bg-gray-100" asChild>

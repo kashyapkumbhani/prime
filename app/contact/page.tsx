@@ -1,3 +1,5 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,44 +14,53 @@ import {
   Clock, 
   MapPin, 
   Send,
-  Headphones,
   Globe,
-  Shield
+  Shield,
+  ExternalLink
 } from "lucide-react";
 
 export default function ContactPage() {
   const contactMethods = [
     {
+      icon: MessageSquare,
+      title: "WhatsApp Support (Fastest Response)",
+      description: "Get instant support via WhatsApp for urgent visa document needs",
+      contact: "+91 93161 05685",
+      action: "Chat on WhatsApp",
+      availability: "Fastest Response",
+      color: "text-green-600 bg-green-100",
+      priority: true,
+      link: "https://wa.me/919316105685"
+    },
+    {
       icon: Mail,
       title: "Email Support",
-      description: "Get detailed assistance via email",
-      contact: "support@primetravel.com",
+      description: "Send us an email for detailed inquiries about visa documentation",
+      contact: "primedummyticket@gmail.com",
+      action: "Send Email",
       availability: "24/7 Response",
-      color: "text-blue-600 bg-blue-100"
+      color: "text-blue-600 bg-blue-100",
+      link: "mailto:primedummyticket@gmail.com"
     },
     {
       icon: Phone,
       title: "Phone Support",
-      description: "Speak directly with our experts",
-      contact: "+91 9876543210",
+      description: "Call us for urgent visa document matters",
+      contact: "+91 93161 05685",
+      action: "Call Now",
       availability: "24/7 Available",
-      color: "text-green-600 bg-green-100"
+      color: "text-orange-600 bg-orange-100",
+      link: "tel:+919316105685"
     },
     {
-      icon: MessageSquare,
-      title: "Live Chat",
-      description: "Instant messaging support",
-      contact: "Chat Widget",
-      availability: "Real-time Help",
-      color: "text-purple-600 bg-purple-100"
-    },
-    {
-      icon: Headphones,
-      title: "WhatsApp",
-      description: "Quick support via WhatsApp",
-      contact: "+91 9876543210",
-      availability: "Business Hours",
-      color: "text-emerald-600 bg-emerald-100"
+      icon: Globe,
+      title: "Official Website",
+      description: "Visit our official website for more information",
+      contact: "https://primedummyticket.com/",
+      action: "Visit Website",
+      availability: "Always Online",
+      color: "text-purple-600 bg-purple-100",
+      link: "https://primedummyticket.com"
     }
   ];
 
@@ -129,7 +140,14 @@ export default function ContactPage() {
             {contactMethods.map((method, index) => {
               const IconComponent = method.icon;
               return (
-                <Card key={index} className="text-center hover:shadow-lg transition-shadow">
+                <Card key={index} className={`text-center hover:shadow-lg transition-all duration-300 ${method.priority ? 'ring-2 ring-green-200 relative' : ''}`}>
+                  {method.priority && (
+                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                      <Badge className="bg-green-500 text-white px-3 py-1">
+                        Recommended
+                      </Badge>
+                    </div>
+                  )}
                   <CardHeader>
                     <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full ${method.color} mb-4 mx-auto`}>
                       <IconComponent className="h-8 w-8" />
@@ -137,11 +155,19 @@ export default function ContactPage() {
                     <CardTitle className="text-xl">{method.title}</CardTitle>
                     <p className="text-gray-600 text-sm">{method.description}</p>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="space-y-3">
                     <p className="font-semibold text-gray-900 mb-1">{method.contact}</p>
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="outline" className="text-xs mb-3">
                       {method.availability}
                     </Badge>
+                    <Button 
+                      className="w-full" 
+                      variant={method.priority ? "default" : "outline"}
+                      onClick={() => window.open(method.link, '_blank')}
+                    >
+                      {method.action}
+                      <ExternalLink className="ml-2 h-4 w-4" />
+                    </Button>
                   </CardContent>
                 </Card>
               );
@@ -353,20 +379,30 @@ export default function ContactPage() {
       <section className="py-20 bg-blue-600">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Need Urgent Help?
+            Need Urgent Visa Document Help?
           </h2>
           <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            For urgent travel bookings or time-sensitive support, 
-            contact our priority support line available 24/7.
+            For urgent visa documentation, dummy tickets, or time-sensitive support, 
+            contact PrimeDummyTicket priority support available 24/7.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button size="lg" variant="secondary" className="px-8 py-6 text-lg bg-white text-blue-600 hover:bg-gray-100">
+            <Button 
+              size="lg" 
+              variant="secondary" 
+              className="px-8 py-6 text-lg bg-white text-blue-600 hover:bg-gray-100"
+              onClick={() => window.open('tel:+919316105685', '_blank')}
+            >
               <Phone className="mr-2 h-5 w-5" />
-              Call Now: +91 9876543210
+              Call Now: +91 93161 05685
             </Button>
-            <Button size="lg" variant="outline" className="px-8 py-6 text-lg border-white text-white hover:bg-white hover:text-blue-600">
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="px-8 py-6 text-lg border-white text-white hover:bg-white hover:text-blue-600"
+              onClick={() => window.open('https://wa.me/919316105685', '_blank')}
+            >
               <MessageSquare className="mr-2 h-5 w-5" />
-              Start Live Chat
+              WhatsApp Support
             </Button>
           </div>
         </div>
