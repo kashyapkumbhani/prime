@@ -169,6 +169,8 @@ export default function AdminDashboard() {
       const response = await fetch('/api/admin/orders');
       if (response.ok) {
         const data = await response.json();
+        console.log('📊 Fetched orders data:', data);
+        console.log('🧑‍💼 Sample order with travelers:', data.allOrders?.[0] || data.orders?.[0]);
         setAllOrders(data.allOrders || data.orders);
         setStats(data.stats);
       }
@@ -618,28 +620,410 @@ export default function AdminDashboard() {
                 </TableHeader>
                 <TableBody>
                   {orders.map((order) => (
-                    <TableRow key={order.id}>
-                      <TableCell className="font-medium text-sm">{order.id}</TableCell>
-                      <TableCell>
-                        <div>
-                          <p className="font-medium">{order.customerName || 'N/A'}</p>
-                          <p className="text-sm text-muted-foreground">{order.customerEmail || 'N/A'}</p>
+                    <Drawer key={order.id}>
+                      <TableRow>
+                        <TableCell className="font-medium text-sm">
+                          <DrawerTrigger asChild>
+                            <Button variant="link" className="p-0 h-auto font-medium text-sm text-blue-600 hover:text-blue-800">
+                              {order.id}
+                            </Button>
+                          </DrawerTrigger>
+                        </TableCell>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium">{order.customerName || 'N/A'}</p>
+                            <p className="text-sm text-muted-foreground">{order.customerEmail || 'N/A'}</p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center space-x-2">
+                            {getServiceIcon(order.serviceType || '')}
+                            <span className="text-sm">
+                              {getServiceName(order.serviceType || '')}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="font-medium">₹{(order.totalAmount || 0).toLocaleString()}</TableCell>
+                        <TableCell>{getStatusBadge(order.status || 'pending')}</TableCell>
+                        <TableCell className="text-sm">
+                          {order.createdAt ? format(new Date(order.createdAt), "MMM dd, yyyy") : 'N/A'}
+                        </TableCell>
+                      </TableRow>
+                      
+                      <DrawerContent className="max-h-[90vh] overflow-y-auto">
+                        <DrawerHeader className="text-left border-b">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <DrawerTitle className="flex items-center gap-2 text-xl">
+                                {getServiceIcon(order.serviceType || '')}
+                                Order Details - {order.id}
+                              </DrawerTitle>
+                              <DrawerDescription className="text-base">
+                                {getServiceName(order.serviceType || '')} • {order.createdAt ? format(new Date(order.createdAt), "MMM dd, yyyy 'at' HH:mm") : 'N/A'}
+                              </DrawerDescription>
+                            </div>
+                            <DrawerClose asChild>
+                              <Button variant="outline" size="sm">
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </DrawerClose>
+                          </div>
+                        </DrawerHeader>
+                        
+                        <div className="px-6 py-4 space-y-6 overflow-y-auto flex-1">
+                          {/* Customer Information */}
+                          <Card>
+                            <CardHeader className="pb-3">
+                              <CardTitle className="flex items-center gap-2 text-lg">
+                                <User className="h-5 w-5" />
+                                Customer Information
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="flex items-center gap-2">
+                                  <User className="h-4 w-4 text-muted-foreground" />
+                                  <div>
+                                    <p className="text-sm text-muted-foreground">Name</p>
+                                    <p className="font-medium">{order.customerName || 'N/A'}</p>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Mail className="h-4 w-4 text-muted-foreground" />
+                                  <div>
+                                    <p className="text-sm text-muted-foreground">Email</p>
+                                    <p className="font-medium">{order.customerEmail || 'N/A'}</p>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Phone className="h-4 w-4 text-muted-foreground" />
+                                  <div>
+                                    <p className="text-sm text-muted-foreground">Phone</p>
+                                    <p className="font-medium">{order.customerPhone || 'N/A'}</p>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Users className="h-4 w-4 text-muted-foreground" />
+                                  <div>
+                                    <p className="text-sm text-muted-foreground">Travelers</p>
+                                    <p className="font-medium">{order.travelers?.length || 0}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          {/* Order Information */}
+                          <Card>
+                            <CardHeader className="pb-3">
+                              <CardTitle className="flex items-center gap-2 text-lg">
+                                <FileText className="h-5 w-5" />
+                                Order Information
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="flex items-center gap-2">
+                                  <CreditCard className="h-4 w-4 text-muted-foreground" />
+                                  <div>
+                                    <p className="text-sm text-muted-foreground">Total Amount</p>
+                                    <p className="font-medium text-lg">₹{(order.totalAmount || 0).toLocaleString()}</p>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Clock className="h-4 w-4 text-muted-foreground" />
+                                  <div>
+                                    <p className="text-sm text-muted-foreground">Status</p>
+                                    <div className="mt-1">
+                                      {getStatusBadge(order.status || 'pending')}
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                                  <div>
+                                    <p className="text-sm text-muted-foreground">Order Date</p>
+                                    <p className="font-medium">{order.createdAt ? format(new Date(order.createdAt), "MMM dd, yyyy 'at' HH:mm") : 'N/A'}</p>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                                  <div>
+                                    <p className="text-sm text-muted-foreground">Completed Date</p>
+                                    <p className="font-medium">{order.completedAt ? format(new Date(order.completedAt), "MMM dd, yyyy 'at' HH:mm") : 'Not completed'}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          {/* Travelers Information */}
+                          {(() => {
+                            console.log('👥 Order travelers data:', order.travelers);
+                            return order.travelers && order.travelers.length > 0 ? (
+                              <Card>
+                                <CardHeader className="pb-3">
+                                  <CardTitle className="flex items-center gap-2 text-lg">
+                                    <Users className="h-5 w-5" />
+                                    Travelers ({order.travelers.length})
+                                  </CardTitle>
+                                </CardHeader>
+                                <CardContent className="p-4">
+                                  <div className="overflow-x-auto -mx-4">
+                                    <div className="min-w-full px-4">
+                                      <Table className="w-full">
+                                        <TableHeader>
+                                          <TableRow>
+                                            <TableHead className="min-w-[200px] text-left">Full Name</TableHead>
+                                            <TableHead className="min-w-[140px] text-left">Date of Birth</TableHead>
+                                            <TableHead className="min-w-[100px] text-left">Type</TableHead>
+                                          </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                          {order.travelers.map((traveler, index) => {
+                                            console.log(`👤 Traveler ${index + 1}:`, traveler);
+                                            return (
+                                              <TableRow key={traveler.id || index} className="border-b">
+                                                <TableCell className="py-3">
+                                                  <div className="font-medium text-sm">
+                                                    {[
+                                                      traveler.title?.trim(),
+                                                      traveler.firstName?.trim(),
+                                                      traveler.lastName?.trim()
+                                                    ].filter(Boolean).join(' ') || 'N/A'}
+                                                  </div>
+                                                </TableCell>
+                                                <TableCell className="py-3 text-sm">
+                                                  {traveler.dateOfBirth ? (
+                                                    format(new Date(traveler.dateOfBirth), "MMM dd, yyyy")
+                                                  ) : (
+                                                    <span className="text-muted-foreground">N/A</span>
+                                                  )}
+                                                </TableCell>
+                                                <TableCell className="py-3">
+                                                  {traveler.isPrimary ? (
+                                                    <Badge variant="default" className="text-xs">Primary</Badge>
+                                                  ) : (
+                                                    <Badge variant="secondary" className="text-xs">Companion</Badge>
+                                                  )}
+                                                </TableCell>
+                                              </TableRow>
+                                            );
+                                          })}
+                                        </TableBody>
+                                      </Table>
+                                    </div>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ) : (
+                              <Card>
+                                <CardHeader className="pb-3">
+                                  <CardTitle className="flex items-center gap-2 text-lg">
+                                    <Users className="h-5 w-5" />
+                                    Travelers
+                                  </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                  <div className="text-center py-4 text-muted-foreground">
+                                    <Users className="h-8 w-8 mx-auto mb-2" />
+                                    <p>No traveler information available</p>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            );
+                          })()}
+
+                          {/* Service-Specific Details */}
+                          {order.flightBooking && (
+                            <Card>
+                              <CardHeader className="pb-3">
+                                <CardTitle className="flex items-center gap-2 text-lg">
+                                  <Plane className="h-5 w-5" />
+                                  Flight Details
+                                </CardTitle>
+                              </CardHeader>
+                              <CardContent>
+                                <div className="rounded-md border">
+                                  <Table>
+                                    <TableBody>
+                                      <TableRow>
+                                        <TableCell className="font-medium">Trip Type</TableCell>
+                                        <TableCell>{order.flightBooking.tripType}</TableCell>
+                                      </TableRow>
+                                      <TableRow>
+                                        <TableCell className="font-medium">Route</TableCell>
+                                        <TableCell>{order.flightBooking.departureAirport} → {order.flightBooking.arrivalAirport}</TableCell>
+                                      </TableRow>
+                                      <TableRow>
+                                        <TableCell className="font-medium">Departure Date</TableCell>
+                                        <TableCell>{format(new Date(order.flightBooking.departureDate), "MMM dd, yyyy")}</TableCell>
+                                      </TableRow>
+                                      {order.flightBooking.returnDate && (
+                                        <TableRow>
+                                          <TableCell className="font-medium">Return Date</TableCell>
+                                          <TableCell>{format(new Date(order.flightBooking.returnDate), "MMM dd, yyyy")}</TableCell>
+                                        </TableRow>
+                                      )}
+                                      <TableRow>
+                                        <TableCell className="font-medium">Purpose</TableCell>
+                                        <TableCell>{order.flightBooking.purpose}</TableCell>
+                                      </TableRow>
+                                      <TableRow>
+                                        <TableCell className="font-medium">Delivery Timing</TableCell>
+                                        <TableCell>{order.flightBooking.deliveryTiming}</TableCell>
+                                      </TableRow>
+                                      {order.flightBooking.pnrNumber && (
+                                        <TableRow>
+                                          <TableCell className="font-medium">PNR Number</TableCell>
+                                          <TableCell className="font-mono">{order.flightBooking.pnrNumber}</TableCell>
+                                        </TableRow>
+                                      )}
+                                      {order.flightBooking.specialRequests && (
+                                        <TableRow>
+                                          <TableCell className="font-medium">Special Requests</TableCell>
+                                          <TableCell>{order.flightBooking.specialRequests}</TableCell>
+                                        </TableRow>
+                                      )}
+                                    </TableBody>
+                                  </Table>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          )}
+
+                          {order.hotelBooking && (
+                            <Card>
+                              <CardHeader className="pb-3">
+                                <CardTitle className="flex items-center gap-2 text-lg">
+                                  <Building className="h-5 w-5" />
+                                  Hotel Details
+                                </CardTitle>
+                              </CardHeader>
+                              <CardContent>
+                                <div className="rounded-md border">
+                                  <Table>
+                                    <TableBody>
+                                      <TableRow>
+                                        <TableCell className="font-medium">Destination</TableCell>
+                                        <TableCell>{order.hotelBooking.destinationCity}</TableCell>
+                                      </TableRow>
+                                      <TableRow>
+                                        <TableCell className="font-medium">Check-in Date</TableCell>
+                                        <TableCell>{format(new Date(order.hotelBooking.checkInDate), "MMM dd, yyyy")}</TableCell>
+                                      </TableRow>
+                                      <TableRow>
+                                        <TableCell className="font-medium">Check-out Date</TableCell>
+                                        <TableCell>{format(new Date(order.hotelBooking.checkOutDate), "MMM dd, yyyy")}</TableCell>
+                                      </TableRow>
+                                      <TableRow>
+                                        <TableCell className="font-medium">Rooms</TableCell>
+                                        <TableCell>{order.hotelBooking.numberOfRooms}</TableCell>
+                                      </TableRow>
+                                      <TableRow>
+                                        <TableCell className="font-medium">Guests</TableCell>
+                                        <TableCell>{order.hotelBooking.numberOfGuests}</TableCell>
+                                      </TableRow>
+                                      <TableRow>
+                                        <TableCell className="font-medium">Purpose</TableCell>
+                                        <TableCell>{order.hotelBooking.purpose}</TableCell>
+                                      </TableRow>
+                                      {order.hotelBooking.confirmationNumber && (
+                                        <TableRow>
+                                          <TableCell className="font-medium">Confirmation Number</TableCell>
+                                          <TableCell className="font-mono">{order.hotelBooking.confirmationNumber}</TableCell>
+                                        </TableRow>
+                                      )}
+                                      {order.hotelBooking.specialRequests && (
+                                        <TableRow>
+                                          <TableCell className="font-medium">Special Requests</TableCell>
+                                          <TableCell>{order.hotelBooking.specialRequests}</TableCell>
+                                        </TableRow>
+                                      )}
+                                    </TableBody>
+                                  </Table>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          )}
+
+                          {order.insuranceBooking && (
+                            <Card>
+                              <CardHeader className="pb-3">
+                                <CardTitle className="flex items-center gap-2 text-lg">
+                                  <Heart className="h-5 w-5" />
+                                  Insurance Details
+                                </CardTitle>
+                              </CardHeader>
+                              <CardContent>
+                                <div className="rounded-md border">
+                                  <Table>
+                                    <TableBody>
+                                      <TableRow>
+                                        <TableCell className="font-medium">Destination Country</TableCell>
+                                        <TableCell>{order.insuranceBooking.destinationCountry}</TableCell>
+                                      </TableRow>
+                                      <TableRow>
+                                        <TableCell className="font-medium">Travel Start Date</TableCell>
+                                        <TableCell>{format(new Date(order.insuranceBooking.travelStartDate), "MMM dd, yyyy")}</TableCell>
+                                      </TableRow>
+                                      <TableRow>
+                                        <TableCell className="font-medium">Travel End Date</TableCell>
+                                        <TableCell>{format(new Date(order.insuranceBooking.travelEndDate), "MMM dd, yyyy")}</TableCell>
+                                      </TableRow>
+                                      <TableRow>
+                                        <TableCell className="font-medium">Coverage Type</TableCell>
+                                        <TableCell>{order.insuranceBooking.coverageType}</TableCell>
+                                      </TableRow>
+                                      <TableRow>
+                                        <TableCell className="font-medium">Purpose</TableCell>
+                                        <TableCell>{order.insuranceBooking.purpose}</TableCell>
+                                      </TableRow>
+                                      {order.insuranceBooking.policyNumber && (
+                                        <TableRow>
+                                          <TableCell className="font-medium">Policy Number</TableCell>
+                                          <TableCell className="font-mono">{order.insuranceBooking.policyNumber}</TableCell>
+                                        </TableRow>
+                                      )}
+                                      {order.insuranceBooking.preExistingConditions && (
+                                        <TableRow>
+                                          <TableCell className="font-medium">Pre-existing Conditions</TableCell>
+                                          <TableCell>{order.insuranceBooking.preExistingConditions}</TableCell>
+                                        </TableRow>
+                                      )}
+                                      {order.insuranceBooking.specialRequests && (
+                                        <TableRow>
+                                          <TableCell className="font-medium">Special Requests</TableCell>
+                                          <TableCell>{order.insuranceBooking.specialRequests}</TableCell>
+                                        </TableRow>
+                                      )}
+                                    </TableBody>
+                                  </Table>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          )}
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center space-x-2">
-                          {getServiceIcon(order.serviceType || '')}
-                          <span className="text-sm">
-                            {getServiceName(order.serviceType || '')}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-medium">₹{(order.totalAmount || 0).toLocaleString()}</TableCell>
-                      <TableCell>{getStatusBadge(order.status || 'pending')}</TableCell>
-                      <TableCell className="text-sm">
-                        {order.createdAt ? format(new Date(order.createdAt), "MMM dd, yyyy") : 'N/A'}
-                      </TableCell>
-                    </TableRow>
+                        
+                        <DrawerFooter className="pt-2">
+                          <div className="flex gap-2">
+                            <Button 
+                              variant="outline" 
+                              onClick={() => exportSingleOrderToCSV(order)}
+                              className="flex-1"
+                            >
+                              <Download className="h-4 w-4 mr-2" />
+                              Export Order Data
+                            </Button>
+                            <DrawerClose asChild>
+                              <Button variant="secondary" className="flex-1">
+                                Close
+                              </Button>
+                            </DrawerClose>
+                          </div>
+                        </DrawerFooter>
+                      </DrawerContent>
+                    </Drawer>
                   ))}
                 </TableBody>
               </Table>

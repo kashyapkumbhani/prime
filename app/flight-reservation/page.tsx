@@ -14,7 +14,7 @@ import { Progress } from "@/components/ui/progress";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { CheckIcon, Plane, ArrowRight, ArrowLeft, CalendarIcon, MapPin, Users, Clock, FileText } from "lucide-react";
+import { CheckIcon, Plane, ArrowRight, ArrowLeft, CalendarIcon, MapPin, Users, Clock, FileText, Shield, Globe } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import airportsData from "@/data/airports.json";
@@ -52,16 +52,25 @@ export default function FlightReservationPage() {
   const [deliveryTiming, setDeliveryTiming] = useState<"now" | "later">("now");
   const [purpose, setPurpose] = useState("");
   const [specialRequest, setSpecialRequest] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
+  const [isDepartureOpen, setIsDepartureOpen] = useState(false);
+  const [isArrivalOpen, setIsArrivalOpen] = useState(false);
+  const [departureSearchValue, setDepartureSearchValue] = useState("");
+  const [arrivalSearchValue, setArrivalSearchValue] = useState("");
 
   const airports: Airport[] = airportsData;
   
-  const filteredAirports = airports.filter(airport => 
-    airport.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-    airport.city.toLowerCase().includes(searchValue.toLowerCase()) ||
-    airport.country.toLowerCase().includes(searchValue.toLowerCase()) ||
-    airport.code.toLowerCase().includes(searchValue.toLowerCase())
+  const filteredDepartureAirports = airports.filter(airport => 
+    airport.name.toLowerCase().includes(departureSearchValue.toLowerCase()) ||
+    airport.city.toLowerCase().includes(departureSearchValue.toLowerCase()) ||
+    airport.country.toLowerCase().includes(departureSearchValue.toLowerCase()) ||
+    airport.code.toLowerCase().includes(departureSearchValue.toLowerCase())
+  );
+
+  const filteredArrivalAirports = airports.filter(airport => 
+    airport.name.toLowerCase().includes(arrivalSearchValue.toLowerCase()) ||
+    airport.city.toLowerCase().includes(arrivalSearchValue.toLowerCase()) ||
+    airport.country.toLowerCase().includes(arrivalSearchValue.toLowerCase()) ||
+    airport.code.toLowerCase().includes(arrivalSearchValue.toLowerCase())
   );
 
   const steps = [
