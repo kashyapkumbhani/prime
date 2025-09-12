@@ -8,8 +8,10 @@ export async function GET() {
     // Fetch all orders with their details
     const ordersFromDb = await prisma.order.findMany({
       include: {
-        customer: true,
         travelers: true,
+        flightBooking: true,
+        hotelBooking: true,
+        insuranceBooking: true,
       },
       orderBy: {
         createdAt: 'desc'
@@ -20,29 +22,18 @@ export async function GET() {
     const orders = ordersFromDb.map(order => ({
       id: order.id,
       serviceType: order.serviceType,
-      customerName: order.customer.name,
-      customerEmail: order.customer.email,
-      customerPhone: order.customer.phone,
+      customerName: order.customerName,
+      customerEmail: order.customerEmail,
+      customerPhone: order.customerPhone,
       numberOfTravelers: order.travelers.length,
       totalAmount: order.totalAmount,
       status: order.status.toLowerCase(),
       createdAt: order.createdAt.toISOString(),
       completedAt: order.completedAt?.toISOString(),
-      flightBooking: order.flightFrom || order.flightTo ? {
-        from: order.flightFrom,
-        to: order.flightTo,
-        departureDate: order.departureDate,
-        returnDate: order.returnDate
-      } : null,
-      hotelBooking: order.destination ? {
-        destination: order.destination,
-        checkinDate: order.checkinDate,
-        checkoutDate: order.checkoutDate
-      } : null,
-      insuranceBooking: order.coverageType ? {
-        coverage: order.coverageType,
-        tripValue: order.tripValue
-      } : null
+      travelers: order.travelers,
+      flightBooking: order.flightBooking,
+      hotelBooking: order.hotelBooking,
+      insuranceBooking: order.insuranceBooking
     }));
 
     // Calculate statistics

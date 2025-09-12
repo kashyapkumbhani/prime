@@ -214,7 +214,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$date$2d$fns$
 ;
 ;
 ;
-function OrderConfirmationPage() {
+function OrderConfirmationContent() {
     const searchParams = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useSearchParams"])();
     const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRouter"])();
     const orderId = searchParams.get("orderId");
@@ -222,14 +222,7 @@ function OrderConfirmationPage() {
     const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(true);
     const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("");
     const [isDownloading, setIsDownloading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
-    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
-        if (orderId) {
-            fetchOrderDetails();
-        }
-    }, [
-        orderId
-    ]);
-    const fetchOrderDetails = async ()=>{
+    const fetchOrderDetails = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useCallback"])(async ()=>{
         try {
             const response = await fetch(`/api/orders/${orderId}`);
             if (response.ok) {
@@ -238,12 +231,22 @@ function OrderConfirmationPage() {
             } else {
                 setError("Order not found");
             }
-        } catch (error) {
+        } catch  {
             setError("Failed to load order details");
         } finally{
             setLoading(false);
         }
-    };
+    }, [
+        orderId
+    ]);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        if (orderId) {
+            fetchOrderDetails();
+        }
+    }, [
+        orderId,
+        fetchOrderDetails
+    ]);
     const getServiceIcon = (serviceType)=>{
         // Normalize the service type to handle both formats
         const normalizedType = serviceType.toLowerCase().replace('_', '-');
@@ -253,7 +256,7 @@ function OrderConfirmationPage() {
                     className: "h-6 w-6 text-blue-600"
                 }, void 0, false, {
                     fileName: "[project]/app/order-confirmation/page.tsx",
-                    lineNumber: 81,
+                    lineNumber: 89,
                     columnNumber: 16
                 }, this);
             case "hotel-booking":
@@ -261,7 +264,7 @@ function OrderConfirmationPage() {
                     className: "h-6 w-6 text-green-600"
                 }, void 0, false, {
                     fileName: "[project]/app/order-confirmation/page.tsx",
-                    lineNumber: 83,
+                    lineNumber: 91,
                     columnNumber: 16
                 }, this);
             case "travel-insurance":
@@ -269,7 +272,7 @@ function OrderConfirmationPage() {
                     className: "h-6 w-6 text-red-600"
                 }, void 0, false, {
                     fileName: "[project]/app/order-confirmation/page.tsx",
-                    lineNumber: 85,
+                    lineNumber: 93,
                     columnNumber: 16
                 }, this);
             default:
@@ -277,7 +280,7 @@ function OrderConfirmationPage() {
                     className: "h-6 w-6 text-gray-600"
                 }, void 0, false, {
                     fileName: "[project]/app/order-confirmation/page.tsx",
-                    lineNumber: 87,
+                    lineNumber: 95,
                     columnNumber: 16
                 }, this);
         }
@@ -379,7 +382,7 @@ Phone: +91 9876543210
                     url: shareUrl
                 });
             } catch (error) {
-                if (error.name !== 'AbortError') {
+                if (error instanceof Error && error.name !== 'AbortError') {
                     console.error('Error sharing:', error);
                     fallbackShare(shareText, shareUrl);
                 }
@@ -432,7 +435,7 @@ Phone: +91 9876543210
                         className: "animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"
                     }, void 0, false, {
                         fileName: "[project]/app/order-confirmation/page.tsx",
-                        lineNumber: 248,
+                        lineNumber: 256,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -440,18 +443,18 @@ Phone: +91 9876543210
                         children: "Loading order details..."
                     }, void 0, false, {
                         fileName: "[project]/app/order-confirmation/page.tsx",
-                        lineNumber: 249,
+                        lineNumber: 257,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/order-confirmation/page.tsx",
-                lineNumber: 247,
+                lineNumber: 255,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/app/order-confirmation/page.tsx",
-            lineNumber: 246,
+            lineNumber: 254,
             columnNumber: 7
         }, this);
     }
@@ -469,12 +472,12 @@ Phone: +91 9876543210
                                 className: "h-12 w-12 mx-auto"
                             }, void 0, false, {
                                 fileName: "[project]/app/order-confirmation/page.tsx",
-                                lineNumber: 261,
+                                lineNumber: 269,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/order-confirmation/page.tsx",
-                            lineNumber: 260,
+                            lineNumber: 268,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -482,7 +485,7 @@ Phone: +91 9876543210
                             children: "Order Not Found"
                         }, void 0, false, {
                             fileName: "[project]/app/order-confirmation/page.tsx",
-                            lineNumber: 263,
+                            lineNumber: 271,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -490,7 +493,7 @@ Phone: +91 9876543210
                             children: error
                         }, void 0, false, {
                             fileName: "[project]/app/order-confirmation/page.tsx",
-                            lineNumber: 264,
+                            lineNumber: 272,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -499,23 +502,23 @@ Phone: +91 9876543210
                             children: "Return Home"
                         }, void 0, false, {
                             fileName: "[project]/app/order-confirmation/page.tsx",
-                            lineNumber: 265,
+                            lineNumber: 273,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/order-confirmation/page.tsx",
-                    lineNumber: 259,
+                    lineNumber: 267,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/order-confirmation/page.tsx",
-                lineNumber: 258,
+                lineNumber: 266,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/app/order-confirmation/page.tsx",
-            lineNumber: 257,
+            lineNumber: 265,
             columnNumber: 7
         }, this);
     }
@@ -533,12 +536,12 @@ Phone: +91 9876543210
                                 className: "h-8 w-8 text-green-600"
                             }, void 0, false, {
                                 fileName: "[project]/app/order-confirmation/page.tsx",
-                                lineNumber: 280,
+                                lineNumber: 288,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/order-confirmation/page.tsx",
-                            lineNumber: 279,
+                            lineNumber: 287,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
@@ -546,7 +549,7 @@ Phone: +91 9876543210
                             children: "Booking Confirmed!"
                         }, void 0, false, {
                             fileName: "[project]/app/order-confirmation/page.tsx",
-                            lineNumber: 282,
+                            lineNumber: 290,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -554,13 +557,13 @@ Phone: +91 9876543210
                             children: "Thank you for choosing Prime Travel. Your booking has been successfully processed."
                         }, void 0, false, {
                             fileName: "[project]/app/order-confirmation/page.tsx",
-                            lineNumber: 283,
+                            lineNumber: 291,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/order-confirmation/page.tsx",
-                    lineNumber: 278,
+                    lineNumber: 286,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -582,13 +585,13 @@ Phone: +91 9876543210
                                                             children: getServiceName(orderDetails.serviceType)
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                                            lineNumber: 295,
+                                                            lineNumber: 303,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                    lineNumber: 293,
+                                                    lineNumber: 301,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$badge$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Badge"], {
@@ -599,20 +602,20 @@ Phone: +91 9876543210
                                                             className: "h-3 w-3 mr-1"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                                            lineNumber: 298,
+                                                            lineNumber: 306,
                                                             columnNumber: 19
                                                         }, this),
                                                         "Confirmed"
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                    lineNumber: 297,
+                                                    lineNumber: 305,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                            lineNumber: 292,
+                                            lineNumber: 300,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardDescription"], {
@@ -623,19 +626,19 @@ Phone: +91 9876543210
                                                     children: orderDetails.id
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                    lineNumber: 303,
+                                                    lineNumber: 311,
                                                     columnNumber: 27
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                            lineNumber: 302,
+                                            lineNumber: 310,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                    lineNumber: 291,
+                                    lineNumber: 299,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -648,12 +651,12 @@ Phone: +91 9876543210
                                                 children: getServiceDescription(orderDetails.serviceType)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/order-confirmation/page.tsx",
-                                                lineNumber: 309,
+                                                lineNumber: 317,
                                                 columnNumber: 17
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                            lineNumber: 308,
+                                            lineNumber: 316,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -666,7 +669,7 @@ Phone: +91 9876543210
                                                             className: "h-5 w-5 text-gray-500 mr-3"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                                            lineNumber: 317,
+                                                            lineNumber: 325,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -676,7 +679,7 @@ Phone: +91 9876543210
                                                                     children: "Booking Date"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                    lineNumber: 319,
+                                                                    lineNumber: 327,
                                                                     columnNumber: 21
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -684,19 +687,19 @@ Phone: +91 9876543210
                                                                     children: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$date$2d$fns$2f$format$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["format"])(new Date(orderDetails.createdAt), "PPP 'at' p")
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                    lineNumber: 320,
+                                                                    lineNumber: 328,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                                            lineNumber: 318,
+                                                            lineNumber: 326,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                    lineNumber: 316,
+                                                    lineNumber: 324,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -706,7 +709,7 @@ Phone: +91 9876543210
                                                             className: "h-5 w-5 text-gray-500 mr-3"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                                            lineNumber: 327,
+                                                            lineNumber: 335,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -716,7 +719,7 @@ Phone: +91 9876543210
                                                                     children: "Number of Travelers"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                    lineNumber: 329,
+                                                                    lineNumber: 337,
                                                                     columnNumber: 21
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -727,19 +730,19 @@ Phone: +91 9876543210
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                    lineNumber: 330,
+                                                                    lineNumber: 338,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                                            lineNumber: 328,
+                                                            lineNumber: 336,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                    lineNumber: 326,
+                                                    lineNumber: 334,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -749,7 +752,7 @@ Phone: +91 9876543210
                                                             className: "h-5 w-5 text-gray-500 mr-3"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                                            lineNumber: 337,
+                                                            lineNumber: 345,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -759,7 +762,7 @@ Phone: +91 9876543210
                                                                     children: "Processing Time"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                    lineNumber: 339,
+                                                                    lineNumber: 347,
                                                                     columnNumber: 21
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -767,30 +770,30 @@ Phone: +91 9876543210
                                                                     children: "5-15 minutes (expedited processing)"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                    lineNumber: 340,
+                                                                    lineNumber: 348,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                                            lineNumber: 338,
+                                                            lineNumber: 346,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                    lineNumber: 336,
+                                                    lineNumber: 344,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                            lineNumber: 315,
+                                            lineNumber: 323,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$separator$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Separator"], {}, void 0, false, {
                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                            lineNumber: 347,
+                                            lineNumber: 355,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -801,7 +804,7 @@ Phone: +91 9876543210
                                                     children: "Payment Summary"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                    lineNumber: 351,
+                                                    lineNumber: 359,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -814,65 +817,13 @@ Phone: +91 9876543210
                                                                     children: "Service Fee"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                    lineNumber: 354,
-                                                                    columnNumber: 21
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                    children: [
-                                                                        "₹",
-                                                                        Math.round(orderDetails.totalAmount * 0.85).toLocaleString()
-                                                                    ]
-                                                                }, void 0, true, {
-                                                                    fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                    lineNumber: 355,
-                                                                    columnNumber: 21
-                                                                }, this)
-                                                            ]
-                                                        }, void 0, true, {
-                                                            fileName: "[project]/app/order-confirmation/page.tsx",
-                                                            lineNumber: 353,
-                                                            columnNumber: 19
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: "flex justify-between",
-                                                            children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                    children: "Processing Fee"
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                    lineNumber: 358,
-                                                                    columnNumber: 21
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                    children: [
-                                                                        "₹",
-                                                                        Math.round(orderDetails.totalAmount * 0.1).toLocaleString()
-                                                                    ]
-                                                                }, void 0, true, {
-                                                                    fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                    lineNumber: 359,
-                                                                    columnNumber: 21
-                                                                }, this)
-                                                            ]
-                                                        }, void 0, true, {
-                                                            fileName: "[project]/app/order-confirmation/page.tsx",
-                                                            lineNumber: 357,
-                                                            columnNumber: 19
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: "flex justify-between",
-                                                            children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                    children: "Taxes & Fees"
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/app/order-confirmation/page.tsx",
                                                                     lineNumber: 362,
                                                                     columnNumber: 21
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                     children: [
                                                                         "₹",
-                                                                        Math.round(orderDetails.totalAmount * 0.05).toLocaleString()
+                                                                        Math.round(orderDetails.totalAmount * 0.85).toLocaleString()
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/order-confirmation/page.tsx",
@@ -885,9 +836,61 @@ Phone: +91 9876543210
                                                             lineNumber: 361,
                                                             columnNumber: 19
                                                         }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$separator$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Separator"], {}, void 0, false, {
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "flex justify-between",
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                    children: "Processing Fee"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/order-confirmation/page.tsx",
+                                                                    lineNumber: 366,
+                                                                    columnNumber: 21
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                    children: [
+                                                                        "₹",
+                                                                        Math.round(orderDetails.totalAmount * 0.1).toLocaleString()
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/app/order-confirmation/page.tsx",
+                                                                    lineNumber: 367,
+                                                                    columnNumber: 21
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
                                                             fileName: "[project]/app/order-confirmation/page.tsx",
                                                             lineNumber: 365,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "flex justify-between",
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                    children: "Taxes & Fees"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/order-confirmation/page.tsx",
+                                                                    lineNumber: 370,
+                                                                    columnNumber: 21
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                    children: [
+                                                                        "₹",
+                                                                        Math.round(orderDetails.totalAmount * 0.05).toLocaleString()
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/app/order-confirmation/page.tsx",
+                                                                    lineNumber: 371,
+                                                                    columnNumber: 21
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/app/order-confirmation/page.tsx",
+                                                            lineNumber: 369,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$separator$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Separator"], {}, void 0, false, {
+                                                            fileName: "[project]/app/order-confirmation/page.tsx",
+                                                            lineNumber: 373,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -897,7 +900,7 @@ Phone: +91 9876543210
                                                                     children: "Total Paid"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                    lineNumber: 367,
+                                                                    lineNumber: 375,
                                                                     columnNumber: 21
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -907,25 +910,25 @@ Phone: +91 9876543210
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                    lineNumber: 368,
+                                                                    lineNumber: 376,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                                            lineNumber: 366,
+                                                            lineNumber: 374,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                    lineNumber: 352,
+                                                    lineNumber: 360,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                            lineNumber: 350,
+                                            lineNumber: 358,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -941,7 +944,7 @@ Phone: +91 9876543210
                                                                 className: "animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                lineNumber: 382,
+                                                                lineNumber: 390,
                                                                 columnNumber: 23
                                                             }, this),
                                                             "Generating..."
@@ -952,7 +955,7 @@ Phone: +91 9876543210
                                                                 className: "h-4 w-4 mr-2"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                lineNumber: 387,
+                                                                lineNumber: 395,
                                                                 columnNumber: 23
                                                             }, this),
                                                             "Download Receipt"
@@ -960,7 +963,7 @@ Phone: +91 9876543210
                                                     }, void 0, true)
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                    lineNumber: 375,
+                                                    lineNumber: 383,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -972,32 +975,32 @@ Phone: +91 9876543210
                                                             className: "h-4 w-4 mr-2"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                                            lineNumber: 397,
+                                                            lineNumber: 405,
                                                             columnNumber: 19
                                                         }, this),
                                                         "Share Confirmation"
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                    lineNumber: 392,
+                                                    lineNumber: 400,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                            lineNumber: 374,
+                                            lineNumber: 382,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                    lineNumber: 306,
+                                    lineNumber: 314,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/order-confirmation/page.tsx",
-                            lineNumber: 290,
+                            lineNumber: 298,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1010,12 +1013,12 @@ Phone: +91 9876543210
                                                 children: "Customer Details"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/order-confirmation/page.tsx",
-                                                lineNumber: 409,
+                                                lineNumber: 417,
                                                 columnNumber: 17
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                            lineNumber: 408,
+                                            lineNumber: 416,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -1031,12 +1034,12 @@ Phone: +91 9876543210
                                                                 children: orderDetails.customer.name?.charAt(0) || orderDetails.customer.email.charAt(0).toUpperCase()
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                lineNumber: 414,
+                                                                lineNumber: 422,
                                                                 columnNumber: 21
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                                            lineNumber: 413,
+                                                            lineNumber: 421,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1046,7 +1049,7 @@ Phone: +91 9876543210
                                                                     children: orderDetails.customer.name || orderDetails.customer.email
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                    lineNumber: 419,
+                                                                    lineNumber: 427,
                                                                     columnNumber: 21
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1054,19 +1057,19 @@ Phone: +91 9876543210
                                                                     children: "Primary Contact"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                    lineNumber: 420,
+                                                                    lineNumber: 428,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                                            lineNumber: 418,
+                                                            lineNumber: 426,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                    lineNumber: 412,
+                                                    lineNumber: 420,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1079,7 +1082,7 @@ Phone: +91 9876543210
                                                                     className: "h-4 w-4 text-gray-500 mr-3"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                    lineNumber: 426,
+                                                                    lineNumber: 434,
                                                                     columnNumber: 21
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1087,13 +1090,13 @@ Phone: +91 9876543210
                                                                     children: orderDetails.customer.email
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                    lineNumber: 427,
+                                                                    lineNumber: 435,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                                            lineNumber: 425,
+                                                            lineNumber: 433,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1103,7 +1106,7 @@ Phone: +91 9876543210
                                                                     className: "h-4 w-4 text-gray-500 mr-3"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                    lineNumber: 430,
+                                                                    lineNumber: 438,
                                                                     columnNumber: 21
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1111,31 +1114,31 @@ Phone: +91 9876543210
                                                                     children: orderDetails.customer.phone
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                    lineNumber: 431,
+                                                                    lineNumber: 439,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                                            lineNumber: 429,
+                                                            lineNumber: 437,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                    lineNumber: 424,
+                                                    lineNumber: 432,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                            lineNumber: 411,
+                                            lineNumber: 419,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                    lineNumber: 407,
+                                    lineNumber: 415,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
@@ -1145,12 +1148,12 @@ Phone: +91 9876543210
                                                 children: "What Happens Next?"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/order-confirmation/page.tsx",
-                                                lineNumber: 440,
+                                                lineNumber: 448,
                                                 columnNumber: 17
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                            lineNumber: 439,
+                                            lineNumber: 447,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -1169,12 +1172,12 @@ Phone: +91 9876543210
                                                                         children: "1"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                        lineNumber: 446,
+                                                                        lineNumber: 454,
                                                                         columnNumber: 23
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                    lineNumber: 445,
+                                                                    lineNumber: 453,
                                                                     columnNumber: 21
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1184,7 +1187,7 @@ Phone: +91 9876543210
                                                                             children: "Processing Started"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                            lineNumber: 449,
+                                                                            lineNumber: 457,
                                                                             columnNumber: 23
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1192,19 +1195,19 @@ Phone: +91 9876543210
                                                                             children: "Your booking is being processed by our team"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                            lineNumber: 450,
+                                                                            lineNumber: 458,
                                                                             columnNumber: 23
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                    lineNumber: 448,
+                                                                    lineNumber: 456,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                                            lineNumber: 444,
+                                                            lineNumber: 452,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1217,12 +1220,12 @@ Phone: +91 9876543210
                                                                         children: "2"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                        lineNumber: 456,
+                                                                        lineNumber: 464,
                                                                         columnNumber: 23
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                    lineNumber: 455,
+                                                                    lineNumber: 463,
                                                                     columnNumber: 21
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1232,7 +1235,7 @@ Phone: +91 9876543210
                                                                             children: "Document Preparation"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                            lineNumber: 459,
+                                                                            lineNumber: 467,
                                                                             columnNumber: 23
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1240,19 +1243,19 @@ Phone: +91 9876543210
                                                                             children: "Documents will be prepared within 5-15 minutes"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                            lineNumber: 460,
+                                                                            lineNumber: 468,
                                                                             columnNumber: 23
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                    lineNumber: 458,
+                                                                    lineNumber: 466,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                                            lineNumber: 454,
+                                                            lineNumber: 462,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1265,12 +1268,12 @@ Phone: +91 9876543210
                                                                         children: "3"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                        lineNumber: 466,
+                                                                        lineNumber: 474,
                                                                         columnNumber: 23
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                    lineNumber: 465,
+                                                                    lineNumber: 473,
                                                                     columnNumber: 21
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1280,7 +1283,7 @@ Phone: +91 9876543210
                                                                             children: "Email Delivery"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                            lineNumber: 469,
+                                                                            lineNumber: 477,
                                                                             columnNumber: 23
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1291,25 +1294,25 @@ Phone: +91 9876543210
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                            lineNumber: 470,
+                                                                            lineNumber: 478,
                                                                             columnNumber: 23
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                    lineNumber: 468,
+                                                                    lineNumber: 476,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                                            lineNumber: 464,
+                                                            lineNumber: 472,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                    lineNumber: 443,
+                                                    lineNumber: 451,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1321,7 +1324,7 @@ Phone: +91 9876543210
                                                                 className: "h-5 w-5 text-yellow-600 mr-3"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                lineNumber: 477,
+                                                                lineNumber: 485,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1332,7 +1335,7 @@ Phone: +91 9876543210
                                                                         children: "Estimated Delivery"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                        lineNumber: 479,
+                                                                        lineNumber: 487,
                                                                         columnNumber: 23
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1340,36 +1343,36 @@ Phone: +91 9876543210
                                                                         children: "Within 15 minutes to your email"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                        lineNumber: 480,
+                                                                        lineNumber: 488,
                                                                         columnNumber: 23
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                lineNumber: 478,
+                                                                lineNumber: 486,
                                                                 columnNumber: 21
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/order-confirmation/page.tsx",
-                                                        lineNumber: 476,
+                                                        lineNumber: 484,
                                                         columnNumber: 19
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                                    lineNumber: 475,
+                                                    lineNumber: 483,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                            lineNumber: 442,
+                                            lineNumber: 450,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                    lineNumber: 438,
+                                    lineNumber: 446,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
@@ -1379,12 +1382,12 @@ Phone: +91 9876543210
                                                 children: "Need Help?"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/order-confirmation/page.tsx",
-                                                lineNumber: 490,
+                                                lineNumber: 498,
                                                 columnNumber: 17
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                            lineNumber: 489,
+                                            lineNumber: 497,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -1400,14 +1403,14 @@ Phone: +91 9876543210
                                                                 className: "h-4 w-4 mr-2"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                lineNumber: 495,
+                                                                lineNumber: 503,
                                                                 columnNumber: 21
                                                             }, this),
                                                             "Contact Support"
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/order-confirmation/page.tsx",
-                                                        lineNumber: 494,
+                                                        lineNumber: 502,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -1419,54 +1422,98 @@ Phone: +91 9876543210
                                                                 className: "h-4 w-4 mr-2"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/order-confirmation/page.tsx",
-                                                                lineNumber: 499,
+                                                                lineNumber: 507,
                                                                 columnNumber: 21
                                                             }, this),
                                                             "Return Home"
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/order-confirmation/page.tsx",
-                                                        lineNumber: 498,
+                                                        lineNumber: 506,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/order-confirmation/page.tsx",
-                                                lineNumber: 493,
+                                                lineNumber: 501,
                                                 columnNumber: 17
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/app/order-confirmation/page.tsx",
-                                            lineNumber: 492,
+                                            lineNumber: 500,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/order-confirmation/page.tsx",
-                                    lineNumber: 488,
+                                    lineNumber: 496,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/order-confirmation/page.tsx",
-                            lineNumber: 405,
+                            lineNumber: 413,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/order-confirmation/page.tsx",
-                    lineNumber: 288,
+                    lineNumber: 296,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/app/order-confirmation/page.tsx",
-            lineNumber: 276,
+            lineNumber: 284,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/app/order-confirmation/page.tsx",
-        lineNumber: 275,
+        lineNumber: 283,
+        columnNumber: 5
+    }, this);
+}
+function OrderConfirmationPage() {
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Suspense"], {
+        fallback: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "min-h-screen bg-gray-50 flex items-center justify-center",
+            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "text-center",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"
+                    }, void 0, false, {
+                        fileName: "[project]/app/order-confirmation/page.tsx",
+                        lineNumber: 525,
+                        columnNumber: 11
+                    }, void 0),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                        className: "text-gray-600",
+                        children: "Loading order details..."
+                    }, void 0, false, {
+                        fileName: "[project]/app/order-confirmation/page.tsx",
+                        lineNumber: 526,
+                        columnNumber: 11
+                    }, void 0)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/app/order-confirmation/page.tsx",
+                lineNumber: 524,
+                columnNumber: 9
+            }, void 0)
+        }, void 0, false, {
+            fileName: "[project]/app/order-confirmation/page.tsx",
+            lineNumber: 523,
+            columnNumber: 7
+        }, void 0),
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(OrderConfirmationContent, {}, void 0, false, {
+            fileName: "[project]/app/order-confirmation/page.tsx",
+            lineNumber: 530,
+            columnNumber: 7
+        }, this)
+    }, void 0, false, {
+        fileName: "[project]/app/order-confirmation/page.tsx",
+        lineNumber: 522,
         columnNumber: 5
     }, this);
 }

@@ -92,7 +92,7 @@ export default function AboutPage() {
               About DummyTicket
             </h1>
             <p className="text-xl text-gray-600 mb-8">
-              Your trusted partner for visa documentation services. We've been helping travelers 
+              Your trusted partner for visa documentation services. We&apos;ve been helping travelers
               secure their visa applications with professional, embassy-approved documents for over 5 years.
             </p>
           </div>
@@ -152,7 +152,7 @@ export default function AboutPage() {
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">Our Vision</h3>
                     <p className="text-gray-600">
-                      To become the world's most trusted platform for visa documentation services, 
+                      To become the world&apos;s most trusted platform for visa documentation services,
                       making international travel accessible and stress-free for everyone, everywhere.
                     </p>
                   </div>

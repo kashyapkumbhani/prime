@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,7 +13,6 @@ import {
   Phone,
   Calendar,
   Users,
-  MapPin,
   Plane,
   Hotel,
   Heart,
@@ -23,6 +22,15 @@ import {
   Share2
 } from "lucide-react";
 import { format } from "date-fns";
+
+interface Traveler {
+  id: number;
+  title: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth?: string;
+  isPrimary: boolean;
+}
 
 interface OrderDetails {
   id: string;
@@ -35,12 +43,12 @@ interface OrderDetails {
   totalAmount: number;
   status: string;
   createdAt: string;
-  travelers: any[];
+  travelers: Traveler[];
   numberOfTravelers: number;
   paymentMethod?: string;
 }
 
-export default function OrderConfirmationPage() {
+function OrderConfirmationContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const orderId = searchParams.get("orderId");
@@ -50,13 +58,7 @@ export default function OrderConfirmationPage() {
   const [error, setError] = useState("");
   const [isDownloading, setIsDownloading] = useState(false);
 
-  useEffect(() => {
-    if (orderId) {
-      fetchOrderDetails();
-    }
-  }, [orderId]);
-
-  const fetchOrderDetails = async () => {
+  const fetchOrderDetails = useCallback(async () => {
     try {
       const response = await fetch(`/api/orders/${orderId}`);
       if (response.ok) {
@@ -65,12 +67,18 @@ export default function OrderConfirmationPage() {
       } else {
         setError("Order not found");
       }
-    } catch (error) {
+    } catch {
       setError("Failed to load order details");
     } finally {
       setLoading(false);
     }
-  };
+  }, [orderId]);
+
+  useEffect(() => {
+    if (orderId) {
+      fetchOrderDetails();
+    }
+  }, [orderId, fetchOrderDetails]);
 
   const getServiceIcon = (serviceType: string) => {
     // Normalize the service type to handle both formats
@@ -193,8 +201,8 @@ Phone: +91 9876543210
           text: shareText,
           url: shareUrl
         });
-      } catch (error) {
-        if (error.name !== 'AbortError') {
+      } catch (error: unknown) {
+        if (error instanceof Error && error.name !== 'AbortError') {
           console.error('Error sharing:', error);
           fallbackShare(shareText, shareUrl);
         }
@@ -506,5 +514,20 @@ Phone: +91 9876543210
         </div>
       </div>
     </div>
+  );
+}
+
+export default function OrderConfirmationPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading order details...</p>
+        </div>
+      </div>
+    }>
+      <OrderConfirmationContent />
+    </Suspense>
   );
 }

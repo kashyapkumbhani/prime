@@ -1,0 +1,20 @@
+{
+  "pages": {
+    "/faqs/page": [
+      "static/chunks/ff1a16fafef87110.js",
+      "static/chunks/7dd66bdf8a7e5707.js",
+      "static/chunks/2473c16c0c2f6b5f.css",
+      "static/chunks/3498b0ab5da4083f.css",
+      "static/chunks/2e021f753532f4fc.js",
+      "static/chunks/f5145794c25fec85.js",
+      "static/chunks/2c3543304fb79b47.js",
+      "static/chunks/d2514ac7aab33d34.js",
+      "static/chunks/f402a582c136d78f.js",
+      "static/chunks/91adb7bdb9870c6a.js",
+      "static/chunks/d04efc723d1783d5.js",
+      "static/chunks/f0380d005ebc03eb.js",
+      "static/chunks/1d6739c2f49ade5a.js",
+      "static/chunks/turbopack-6182c2e213e1c137.js"
+    ]
+  }
+}

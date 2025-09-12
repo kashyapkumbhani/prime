@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Shield, Eye, EyeOff, Lock, User } from "lucide-react";
-import { prisma } from "@/lib/prisma";
 
 export default function AdminLoginPage() {
   const [username, setUsername] = useState("");
@@ -49,10 +48,10 @@ export default function AdminLoginPage() {
         // Redirect to dashboard
         router.push("/admin-panel/dashboard");
       } else {
-        const error = await response.json();
-        setError(error.message || "Invalid username or password. Please try again.");
+        const errorData = await response.json();
+        setError(errorData.message || "Invalid username or password. Please try again.");
       }
-    } catch (error) {
+    } catch {
       setError("An error occurred. Please try again.");
     }
 

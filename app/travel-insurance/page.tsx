@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Heart, ArrowRight, ArrowLeft, CalendarIcon, Users, Clock, FileText, MapPin, Shield } from "lucide-react";
+import { Heart, ArrowRight, ArrowLeft, CalendarIcon, Users, Clock, MapPin, Shield } from "lucide-react";
 import { format, differenceInDays } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -471,7 +471,7 @@ export default function TravelInsurancePage() {
                     onValueChange={(value: "basic" | "premium") => setCoverageType(value)}
                     className="grid md:grid-cols-2 gap-4"
                   >
-                    {coverageOptions.map((option, index) => (
+                    {coverageOptions.map((option) => (
                       <Label
                         key={option.type}
                         htmlFor={option.type}

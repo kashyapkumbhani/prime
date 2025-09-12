@@ -228,7 +228,7 @@ export default function FAQsPage() {
               Still Have Questions?
             </h2>
             <p className="text-xl text-gray-600 mb-8">
-              Can't find what you're looking for? Our expert support team is available 24/7 
+              Can&apos;t find what you&apos;re looking for? Our expert support team is available 24/7
               to help with any questions about our services or your specific visa requirements.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
