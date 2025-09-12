@@ -31,7 +31,6 @@ interface Traveler {
   title: string;
   firstName: string;
   lastName: string;
-  dateOfBirth?: string;
   isPrimary: boolean;
 }
 
@@ -426,17 +425,133 @@ Phone: +91 9876543210
             </CardContent>
           </Card>
 
-          {/* Customer & Contact Info */}
+          {/* Customer & Booking Details */}
           <div className="space-y-6">
+            {/* Flight Booking Details */}
+            {orderDetails.flightBooking && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Plane className="h-5 w-5 mr-2 text-blue-600" />
+                    Flight Details
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <div className="text-sm text-gray-500">Route</div>
+                      <div className="font-medium flex items-center">
+                        <MapPin className="h-4 w-4 mr-1" />
+                        {orderDetails.flightBooking.departureAirport} → {orderDetails.flightBooking.arrivalAirport}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-500">Trip Type</div>
+                      <div className="font-medium capitalize">
+                        {orderDetails.flightBooking.tripType.replace("-", " ")}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <div className="text-sm text-gray-500">Departure Date</div>
+                      <div className="font-medium">
+                        {format(new Date(orderDetails.flightBooking.departureDate), "MMM dd, yyyy")}
+                      </div>
+                    </div>
+                    {orderDetails.flightBooking.returnDate && (
+                      <div>
+                        <div className="text-sm text-gray-500">Return Date</div>
+                        <div className="font-medium">
+                          {format(new Date(orderDetails.flightBooking.returnDate), "MMM dd, yyyy")}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <div className="text-sm text-gray-500">Purpose</div>
+                      <div className="font-medium">{orderDetails.flightBooking.purpose}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-500">Delivery</div>
+                      <div className="font-medium capitalize">{orderDetails.flightBooking.deliveryTiming}</div>
+                    </div>
+                  </div>
+                  
+                  {orderDetails.flightBooking.pnrNumber && (
+                    <div className="p-3 bg-green-50 rounded-lg">
+                      <div className="text-sm text-gray-500">PNR Number</div>
+                      <div className="font-mono text-lg font-bold text-green-700">
+                        {orderDetails.flightBooking.pnrNumber}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {orderDetails.flightBooking.specialRequests && (
+                    <div>
+                      <div className="text-sm text-gray-500">Special Requests</div>
+                      <div className="text-sm bg-gray-50 p-3 rounded-lg">
+                        {orderDetails.flightBooking.specialRequests}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+            
+            {/* Travelers Details */}
+            {orderDetails.travelers && orderDetails.travelers.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Users className="h-5 w-5 mr-2 text-green-600" />
+                    Travelers ({orderDetails.travelers.length})
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {orderDetails.travelers.map((traveler, index) => (
+                      <div key={traveler.id} className="flex items-center p-3 bg-gray-50 rounded-lg">
+                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                          <User className="h-5 w-5 text-blue-600" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-medium">
+                            {traveler.title} {traveler.firstName} {traveler.lastName}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {traveler.isPrimary ? 'Primary Traveler' : 'Additional Traveler'}
+                          </div>
+                        </div>
+                        <div className="ml-auto">
+                          {traveler.isPrimary ? (
+                            <Badge variant="default" className="text-xs">Primary</Badge>
+                          ) : (
+                            <Badge variant="secondary" className="text-xs">Companion</Badge>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+            
             {/* Customer Details */}
             <Card>
               <CardHeader>
-                <CardTitle>Customer Details</CardTitle>
+                <CardTitle className="flex items-center">
+                  <User className="h-5 w-5 mr-2 text-purple-600" />
+                  Customer Details
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                    <span className="font-medium text-blue-600">
+                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                    <span className="font-medium text-purple-600">
                       {orderDetails.customer.name?.charAt(0) || orderDetails.customer.email.charAt(0).toUpperCase()}
                     </span>
                   </div>

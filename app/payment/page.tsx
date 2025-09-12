@@ -145,7 +145,18 @@ function PaymentContent() {
         numberOfTravelers: bookingDetails.travelers,
         totalAmount: bookingDetails.amount,
         paymentMethod: paymentMethod,
-        status: "COMPLETED"
+        status: "COMPLETED",
+        // Include flight reservation details
+        primaryTraveler: bookingDetails.primaryTraveler,
+        additionalTravelers: bookingDetails.additionalTravelers,
+        tripType: bookingDetails.tripType,
+        departureAirport: bookingDetails.departureAirport,
+        arrivalAirport: bookingDetails.arrivalAirport,
+        departureDate: bookingDetails.departureDate,
+        returnDate: bookingDetails.returnDate,
+        purpose: bookingDetails.purpose,
+        deliveryTiming: bookingDetails.deliveryTiming,
+        specialRequest: bookingDetails.specialRequest
       };
 
       const response = await fetch('/api/orders/create', {
@@ -196,9 +207,9 @@ function PaymentContent() {
           <p className="text-gray-600">Secure payment processing for your travel booking</p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Payment Methods */}
-          <Card>
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Payment Methods - Left Side */}
+          <Card className="lg:col-span-2">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Shield className="h-5 w-5 mr-2 text-green-600" />
@@ -212,22 +223,24 @@ function PaymentContent() {
               {/* Payment Method Selection */}
               <div>
                 <Label className="text-base font-medium mb-4 block">Select Payment Method</Label>
-                <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="space-y-3">
+                <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {paymentMethods.map((method) => {
                     const IconComponent = method.icon;
                     return (
                       <Label
                         key={method.id}
                         htmlFor={method.id}
-                        className={`flex items-center space-x-3 p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                          paymentMethod === method.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+                        className={`flex flex-col items-center space-y-2 p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-md ${
+                          paymentMethod === method.id ? 'border-blue-500 bg-blue-50 shadow-lg' : 'border-gray-200 hover:border-gray-300'
                         }`}
                       >
-                        <RadioGroupItem value={method.id} id={method.id} />
-                        <IconComponent className="h-5 w-5 text-gray-600" />
-                        <div>
-                          <div className="font-medium">{method.name}</div>
-                          <div className="text-sm text-gray-500">{method.description}</div>
+                        <RadioGroupItem value={method.id} id={method.id} className="mb-2" />
+                        <IconComponent className={`h-8 w-8 ${
+                          paymentMethod === method.id ? 'text-blue-600' : 'text-gray-600'
+                        }`} />
+                        <div className="text-center">
+                          <div className="font-medium text-sm">{method.name}</div>
+                          <div className="text-xs text-gray-500 mt-1">{method.description}</div>
                         </div>
                       </Label>
                     );
@@ -237,17 +250,19 @@ function PaymentContent() {
 
               {/* Card Details Form */}
               {paymentMethod === "card" && (
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="cardNumber">Card Number</Label>
-                    <Input
-                      id="cardNumber"
-                      placeholder="1234 5678 9012 3456"
-                      value={cardDetails.number}
-                      onChange={(e) => handleInputChange("number", e.target.value)}
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
+                <div className="bg-gray-50 p-6 rounded-lg space-y-4">
+                  <h3 className="font-medium text-gray-900 mb-4">Card Details</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="md:col-span-2">
+                      <Label htmlFor="cardNumber">Card Number</Label>
+                      <Input
+                        id="cardNumber"
+                        placeholder="1234 5678 9012 3456"
+                        value={cardDetails.number}
+                        onChange={(e) => handleInputChange("number", e.target.value)}
+                        className="text-lg h-12"
+                      />
+                    </div>
                     <div>
                       <Label htmlFor="expiry">Expiry Date</Label>
                       <Input
@@ -255,6 +270,7 @@ function PaymentContent() {
                         placeholder="MM/YY"
                         value={cardDetails.expiry}
                         onChange={(e) => handleInputChange("expiry", e.target.value)}
+                        className="h-12"
                       />
                     </div>
                     <div>
@@ -264,45 +280,55 @@ function PaymentContent() {
                         placeholder="123"
                         value={cardDetails.cvv}
                         onChange={(e) => handleInputChange("cvv", e.target.value)}
+                        className="h-12"
                       />
                     </div>
-                  </div>
-                  <div>
-                    <Label htmlFor="cardName">Cardholder Name</Label>
-                    <Input
-                      id="cardName"
-                      placeholder="John Doe"
-                      value={cardDetails.name}
-                      onChange={(e) => handleInputChange("name", e.target.value)}
-                    />
+                    <div className="md:col-span-2">
+                      <Label htmlFor="cardName">Cardholder Name</Label>
+                      <Input
+                        id="cardName"
+                        placeholder="John Doe"
+                        value={cardDetails.name}
+                        onChange={(e) => handleInputChange("name", e.target.value)}
+                        className="h-12"
+                      />
+                    </div>
                   </div>
                 </div>
               )}
 
               {/* UPI Form */}
               {paymentMethod === "upi" && (
-                <div>
-                  <Label htmlFor="upiId">UPI ID</Label>
-                  <Input
-                    id="upiId"
-                    placeholder="yourname@paytm"
-                  />
+                <div className="bg-gray-50 p-6 rounded-lg">
+                  <h3 className="font-medium text-gray-900 mb-4">UPI Payment</h3>
+                  <div>
+                    <Label htmlFor="upiId">UPI ID</Label>
+                    <Input
+                      id="upiId"
+                      placeholder="yourname@paytm"
+                      className="h-12 text-lg"
+                    />
+                    <p className="text-sm text-gray-500 mt-2">Enter your UPI ID to proceed with payment</p>
+                  </div>
                 </div>
               )}
 
               {/* Net Banking */}
               {paymentMethod === "netbanking" && (
-                <div>
-                  <Label>Select Your Bank</Label>
-                  <select className="w-full mt-2 p-3 border border-gray-300 rounded-md">
-                    <option>Select Bank</option>
-                    <option>State Bank of India</option>
-                    <option>HDFC Bank</option>
-                    <option>ICICI Bank</option>
-                    <option>Axis Bank</option>
-                    <option>Bank of India</option>
-                    <option>Punjab National Bank</option>
-                  </select>
+                <div className="bg-gray-50 p-6 rounded-lg">
+                  <h3 className="font-medium text-gray-900 mb-4">Net Banking</h3>
+                  <div>
+                    <Label>Select Your Bank</Label>
+                    <select className="w-full mt-2 p-3 h-12 border border-gray-300 rounded-md bg-white">
+                      <option>Select Bank</option>
+                      <option>State Bank of India</option>
+                      <option>HDFC Bank</option>
+                      <option>ICICI Bank</option>
+                      <option>Axis Bank</option>
+                      <option>Bank of India</option>
+                      <option>Punjab National Bank</option>
+                    </select>
+                  </div>
                 </div>
               )}
 
@@ -317,39 +343,41 @@ function PaymentContent() {
             </CardContent>
           </Card>
 
-          {/* Order Summary */}
-          <Card>
-            <CardContent className="p-0">
-              {/* Header Section */}
-              <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6">
-                <h2 className="text-2xl font-bold mb-2">Order Summary</h2>
-                <div className="flex items-center space-x-2 text-blue-100">
-                  {getServiceIcon(bookingDetails.serviceType)}
-                  <span className="text-lg font-medium">{getServiceName(bookingDetails.serviceType)}</span>
-                </div>
-                <p className="text-blue-100 text-sm mt-1">With Real PNR Number</p>
-              </div>
-
-              {/* Service Details */}
-              <div className="p-6 border-b">
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-blue-600 mb-2">
-                    ₹{bookingDetails.amount.toLocaleString()}
+          {/* Order Summary - Right Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-8">
+              <Card className="overflow-hidden">
+                <CardContent className="p-0">
+                  {/* Header Section */}
+                  <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6">
+                    <h2 className="text-xl font-bold mb-2">Order Summary</h2>
+                    <div className="flex items-center space-x-2 text-blue-100">
+                      {getServiceIcon(bookingDetails.serviceType)}
+                      <span className="text-base font-medium">{getServiceName(bookingDetails.serviceType)}</span>
+                    </div>
+                    <p className="text-blue-100 text-sm mt-1">With Real PNR Number</p>
                   </div>
-                  <p className="text-gray-600">
-                    Total for {bookingDetails.travelers} traveler{bookingDetails.travelers > 1 ? 's' : ''}
-                  </p>
-                  <p className="text-sm text-gray-500 mt-1">
-                    ₹999 per traveler
-                  </p>
-                </div>
-              </div>
 
-              {/* Trip Details Section */}
-              {(bookingDetails.departureAirport || bookingDetails.arrivalAirport) && (
-                <div className="p-6 bg-gray-50 border-b">
-                  <h3 className="font-semibold text-gray-900 mb-3">Trip Details</h3>
-                  <div className="space-y-3 text-sm">
+                  {/* Service Details */}
+                  <div className="p-4 border-b">
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-blue-600 mb-1">
+                        ₹{bookingDetails.amount.toLocaleString()}
+                      </div>
+                      <p className="text-gray-600 text-sm">
+                        Total for {bookingDetails.travelers} traveler{bookingDetails.travelers > 1 ? 's' : ''}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        ₹999 per traveler
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Trip Details Section */}
+                  {(bookingDetails.departureAirport || bookingDetails.arrivalAirport) && (
+                    <div className="p-4 bg-gray-50 border-b">
+                      <h3 className="font-semibold text-gray-900 mb-2 text-sm">Trip Details</h3>
+                      <div className="space-y-2 text-xs">
                     {bookingDetails.departureAirport && (
                       <div className="flex items-center">
                         <MapPin className="h-4 w-4 text-gray-500 mr-3" />

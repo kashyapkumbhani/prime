@@ -15,7 +15,17 @@ export async function POST(request: NextRequest) {
       numberOfTravelers,
       totalAmount,
       paymentMethod,
-      status = 'PENDING'
+      status = 'PENDING',
+      primaryTraveler,
+      additionalTravelers,
+      tripType,
+      departureAirport,
+      arrivalAirport,
+      departureDate,
+      returnDate,
+      purpose,
+      deliveryTiming,
+      specialRequest
     } = orderData;
 
     // Create or find customer
@@ -51,20 +61,72 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    // Create travelers
+    // Create travelers with actual form data
     const travelers = [];
-    for (let i = 0; i < numberOfTravelers; i++) {
+    
+    console.log('Creating travelers with data:', { primaryTraveler, additionalTravelers });
+    
+    // Create primary traveler
+    if (primaryTraveler && primaryTraveler.firstName) {
+      const traveler = await prisma.traveler.create({
+        data: {
+          orderId: order.id,
+          title: primaryTraveler.title || 'Mr',
+          firstName: primaryTraveler.firstName || customerName.split(' ')[0],
+          lastName: primaryTraveler.lastName || customerName.split(' ')[1] || '',
+          isPrimary: true
+        }
+      });
+      travelers.push(traveler);
+    } else {
+      // Fallback: create primary traveler from customer name
+      const nameParts = customerName.split(' ');
       const traveler = await prisma.traveler.create({
         data: {
           orderId: order.id,
           title: 'Mr',
-          firstName: i === 0 ? customerName.split(' ')[0] : `Traveler${i + 1}`,
-          lastName: i === 0 ? customerName.split(' ')[1] || 'Doe' : 'Companion',
-          dateOfBirth: new Date(1990, 0, 1), // Default DOB
-          isPrimary: i === 0
+          firstName: nameParts[0] || 'Primary',
+          lastName: nameParts.slice(1).join(' ') || 'Traveler',
+          isPrimary: true
         }
       });
       travelers.push(traveler);
+    }
+    
+    // Create additional travelers
+    if (additionalTravelers && additionalTravelers.length > 0) {
+      for (let i = 0; i < additionalTravelers.length; i++) {
+        const additionalTraveler = additionalTravelers[i];
+        if (additionalTraveler && (additionalTraveler.firstName || additionalTraveler.lastName)) {
+          const traveler = await prisma.traveler.create({
+            data: {
+              orderId: order.id,
+              title: additionalTraveler.title || 'Mr',
+              firstName: additionalTraveler.firstName || `Traveler${i + 2}`,
+              lastName: additionalTraveler.lastName || '',
+              isPrimary: false
+            }
+          });
+          travelers.push(traveler);
+        }
+      }
+    }
+    
+    // Create flight booking if it's a flight reservation
+    if (serviceTypeEnum === 'FLIGHT_RESERVATION' && tripType && departureAirport && arrivalAirport && departureDate) {
+      await prisma.flightBooking.create({
+        data: {
+          orderId: order.id,
+          tripType,
+          departureAirport: `${departureAirport.name} - ${departureAirport.city}, ${departureAirport.country}`,
+          arrivalAirport: `${arrivalAirport.name} - ${arrivalAirport.city}, ${arrivalAirport.country}`,
+          departureDate: new Date(departureDate),
+          returnDate: returnDate ? new Date(returnDate) : null,
+          purpose: purpose || 'Visa Submission / Application',
+          specialRequests: specialRequest,
+          deliveryTiming: deliveryTiming || 'now'
+        }
+      });
     }
 
     return NextResponse.json({
