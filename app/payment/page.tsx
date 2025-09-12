@@ -4,23 +4,15 @@ import { Suspense } from "react";
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { 
-  CreditCard, 
-  Smartphone, 
-  Building, 
-  Shield, 
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Shield,
   Lock,
   CheckCircle,
   ArrowLeft,
   Plane,
   Hotel,
   Heart,
-  Calendar,
-  MapPin,
   Clock,
   Globe
 } from "lucide-react";
@@ -30,14 +22,7 @@ function PaymentContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   
-  const [paymentMethod, setPaymentMethod] = useState("card");
   const [isProcessing, setIsProcessing] = useState(false);
-  const [cardDetails, setCardDetails] = useState({
-    number: "",
-    expiry: "",
-    cvv: "",
-    name: ""
-  });
   
   // Get booking details from URL params or localStorage
   const [bookingDetails, setBookingDetails] = useState({
@@ -106,8 +91,8 @@ function PaymentContent() {
       relevantKeys.forEach(key => {
         try {
           const data = localStorage.getItem(key);
-          console.log(`${key}:`, JSON.parse(data));
-        } catch (e) {
+          console.log(`${key}:`, data ? JSON.parse(data) : null);
+        } catch {
           console.log(`${key} (raw):`, localStorage.getItem(key));
         }
       });
@@ -140,26 +125,6 @@ function PaymentContent() {
     }
   };
 
-  const paymentMethods = [
-    {
-      id: "card",
-      name: "Credit/Debit Card",
-      icon: CreditCard,
-      description: "Visa, MasterCard, American Express"
-    },
-    {
-      id: "upi",
-      name: "UPI",
-      icon: Smartphone,
-      description: "GPay, PhonePe, Paytm, BHIM"
-    },
-    {
-      id: "netbanking",
-      name: "Net Banking",
-      icon: Building,
-      description: "All major banks supported"
-    }
-  ];
 
   const handlePayment = async () => {
     setIsProcessing(true);
@@ -176,7 +141,7 @@ function PaymentContent() {
         customerPhone: bookingDetails.customerPhone || "+91 9876543210",
         numberOfTravelers: bookingDetails.travelers,
         totalAmount: bookingDetails.amount,
-        paymentMethod: paymentMethod,
+        paymentMethod: "card",
         status: "COMPLETED",
         // Include flight reservation details
         primaryTraveler: bookingDetails.primaryTraveler,
@@ -215,12 +180,6 @@ function PaymentContent() {
     }
   };
 
-  const handleInputChange = (field: string, value: string) => {
-    setCardDetails(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50 py-8">

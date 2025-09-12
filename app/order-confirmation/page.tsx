@@ -3,25 +3,19 @@
 import { Suspense, useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { 
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
   CheckCircle2,
   Download,
   Mail,
   Phone,
-  Calendar,
-  Users,
   Plane,
   Hotel,
   Heart,
   Home,
   FileText,
   Clock,
-  Share2,
-  MapPin,
-  User
+  Share2
 } from "lucide-react";
 import { format } from "date-fns";
 
