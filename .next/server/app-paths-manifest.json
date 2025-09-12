@@ -1,7 +1,0 @@
-{
-  "/admin-panel/dashboard/page": "app/admin-panel/dashboard/page.js",
-  "/api/admin/orders/route": "app/api/admin/orders/route.js",
-  "/flight-reservation/page": "app/flight-reservation/page.js",
-  "/hotel-booking/page": "app/hotel-booking/page.js",
-  "/travel-insurance/page": "app/travel-insurance/page.js"
-}
