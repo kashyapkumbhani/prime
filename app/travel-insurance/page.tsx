@@ -613,18 +613,49 @@ export default function TravelInsurancePage() {
                 </Button>
               ) : (
                 <Button 
-                  onClick={() => {
-                    // Save booking data to localStorage for payment page
-                    const bookingData = {
-                      serviceType: "travel-insurance",
-                      amount: totalPrice,
-                      travelers: numberOfTravelers,
+                  onClick={async () => {
+                    // Create secure booking data
+                    const bookingDetails = {
                       customerName: `${primaryTraveler.firstName} ${primaryTraveler.lastName}`,
                       customerEmail: email,
-                      customerPhone: phone
+                      customerPhone: phone,
+                      destinationCountry: destinationCountry,
+                      travelStartDate: travelStartDate,
+                      travelEndDate: travelEndDate,
+                      tripDuration: tripDuration,
+                      coverageType: coverageType,
+                      travelPurpose: travelPurpose,
+                      preExistingConditions: preExistingConditions,
+                      specialRequests: specialRequests,
+                      primaryTraveler: primaryTraveler,
+                      additionalTravelers: additionalTravelers
                     };
-                    localStorage.setItem("currentBooking", JSON.stringify(bookingData));
-                    router.push(`/payment?service=travel-insurance&amount=${totalPrice}&travelers=${numberOfTravelers}`);
+                    
+                    try {
+                      const response = await fetch('/api/create-payment-token', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                          service: 'travel-insurance',
+                          travelers: numberOfTravelers,
+                          totalAmount: totalPrice,
+                          bookingDetails: bookingDetails
+                        })
+                      });
+                      
+                      if (response.ok) {
+                        const data = await response.json();
+                        router.push(data.redirectUrl);
+                      } else {
+                        console.error('Failed to create payment token');
+                        alert('Error creating secure payment session. Please try again.');
+                      }
+                    } catch (error) {
+                      console.error('Error:', error);
+                      alert('Network error. Please check your connection and try again.');
+                    }
                   }}
                   className="flex items-center bg-purple-600 hover:bg-purple-700 text-lg px-8"
                 >

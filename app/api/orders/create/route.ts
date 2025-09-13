@@ -53,10 +53,53 @@ export async function POST(request: NextRequest) {
     // Convert serviceType to enum format
     const serviceTypeEnum = serviceType.replace('-', '_').toUpperCase() as 'FLIGHT_RESERVATION' | 'HOTEL_BOOKING' | 'TRAVEL_INSURANCE';
     
+    // Generate human-readable order ID
+    const generateOrderId = async (serviceType: string): Promise<string> => {
+      let attempts = 0;
+      const maxAttempts = 10;
+      
+      while (attempts < maxAttempts) {
+        const randomNum = Math.floor(Math.random() * 900000) + 100000; // 6-digit number
+        let orderId: string;
+        
+        switch (serviceType) {
+          case 'flight-reservation':
+            orderId = `FLIGHT-${randomNum}`;
+            break;
+          case 'hotel-booking':
+            orderId = `HOTEL-${randomNum}`;
+            break;
+          case 'travel-insurance':
+            orderId = `INSURANCE-${randomNum}`;
+            break;
+          default:
+            orderId = `ORDER-${randomNum}`;
+            break;
+        }
+        
+        // Check if this ID already exists
+        const existingOrder = await prisma.order.findUnique({
+          where: { id: orderId }
+        });
+        
+        if (!existingOrder) {
+          return orderId;
+        }
+        
+        attempts++;
+      }
+      
+      // Fallback to timestamp-based ID if all attempts fail
+      const timestamp = Date.now();
+      return `${serviceType.toUpperCase()}-${timestamp}`;
+    };
+
+    const customOrderId = await generateOrderId(serviceType);
+    
     // Create order
     const order = await prisma.order.create({
       data: {
-        id: `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: customOrderId,
         serviceType: serviceTypeEnum,
         customerId: customer.id,
         customerName,

@@ -531,12 +531,9 @@ export default function HotelBookingPage() {
                     </Button>
                   ) : (
                     <Button 
-                      onClick={() => {
-                        // Save detailed booking data to localStorage for payment page
-                        const bookingData = {
-                          serviceType: "hotel-booking",
-                          amount: calculateTotal(),
-                          travelers: numberOfTravelers,
+                      onClick={async () => {
+                        // Create secure booking data
+                        const bookingDetails = {
                           customerName: `${primaryTraveler.firstName} ${primaryTraveler.lastName}`,
                           customerEmail: email,
                           customerPhone: phone,
@@ -551,8 +548,32 @@ export default function HotelBookingPage() {
                           primaryTraveler: primaryTraveler,
                           additionalTravelers: additionalTravelers
                         };
-                        localStorage.setItem("currentBooking", JSON.stringify(bookingData));
-                        router.push(`/payment?service=hotel-booking&amount=${calculateTotal()}&travelers=${numberOfTravelers}`);
+                        
+                        try {
+                          const response = await fetch('/api/create-payment-token', {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                              service: 'hotel-booking',
+                              travelers: numberOfTravelers,
+                              totalAmount: calculateTotal(),
+                              bookingDetails: bookingDetails
+                            })
+                          });
+                          
+                          if (response.ok) {
+                            const data = await response.json();
+                            router.push(data.redirectUrl);
+                          } else {
+                            console.error('Failed to create payment token');
+                            alert('Error creating secure payment session. Please try again.');
+                          }
+                        } catch (error) {
+                          console.error('Error:', error);
+                          alert('Network error. Please check your connection and try again.');
+                        }
                       }}
                       className="flex items-center bg-green-600 hover:bg-green-700 text-lg px-8"
                     >

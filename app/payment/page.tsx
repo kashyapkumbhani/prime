@@ -23,90 +23,54 @@ function PaymentContent() {
   const router = useRouter();
   
   const [isProcessing, setIsProcessing] = useState(false);
-  
-  // Get booking details from URL params or localStorage
-  const [bookingDetails, setBookingDetails] = useState({
-    serviceType: searchParams.get("service") || "flight-reservation",
-    amount: parseInt(searchParams.get("amount") || "2999"),
-    travelers: parseInt(searchParams.get("travelers") || "1"),
-    customerName: "",
-    customerEmail: "",
-    customerPhone: "",
-    // Flight specific details
-    tripType: "",
-    departureAirport: null as { name: string; city: string; country: string; code: string } | null,
-    arrivalAirport: null as { name: string; city: string; country: string; code: string } | null,
-    departureDate: null as Date | null,
-    returnDate: null as Date | null,
-    // Hotel specific details
-    destinationCity: "",
-    checkInDate: null as Date | null,
-    checkOutDate: null as Date | null,
-    numberOfHotels: 1,
-    // Common details
-    purpose: "",
-    deliveryTiming: "",
-    deliveryDate: null as Date | null,
-    // Traveler details
-    primaryTraveler: null as { title: string; firstName: string; lastName: string } | null,
-    additionalTravelers: [] as { title: string; firstName: string; lastName: string }[],
-    specialRequest: ""
-  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [tokenError, setTokenError] = useState<string | null>(null);
+  const [bookingDetails, setBookingDetails] = useState<any>(null);
+  const [paymentToken, setPaymentToken] = useState<string | null>(null);
 
   useEffect(() => {
-    // Try to get booking details from localStorage if available
-    const savedBookingData = localStorage.getItem("currentBooking");
-    if (savedBookingData) {
-      try {
-        const bookingData = JSON.parse(savedBookingData);
-        console.log("Booking data from localStorage:", bookingData);
-        setBookingDetails(prev => ({
-          ...prev,
-          ...bookingData
-        }));
-      } catch (error) {
-        console.error("Error parsing booking data:", error);
+    const validateToken = async () => {
+      const token = searchParams.get('token');
+      
+      if (!token) {
+        setTokenError('Invalid payment session. Please start your booking again.');
+        setIsLoading(false);
+        return;
       }
-    }
-    
-    // Also try to get detailed form data from localStorage based on service type
-    const serviceType = searchParams.get("service") || "flight-reservation";
-    const formDataKey = serviceType === "hotel-booking" ? "hotelFormData" : "flightFormData";
-    const savedFormData = localStorage.getItem(formDataKey);
-    if (savedFormData) {
+
+      setPaymentToken(token);
+
       try {
-        const formData = JSON.parse(savedFormData);
-        console.log(`${serviceType} form data from localStorage:`, formData);
-        setBookingDetails(prev => ({
-          ...prev,
-          ...formData
-        }));
-      } catch (error) {
-        console.error("Error parsing form data:", error);
-      }
-    }
-    
-    // Debug: Log all localStorage keys to see what's available
-    console.log("Available localStorage keys:", Object.keys(localStorage));
-    
-    // Try other possible localStorage keys
-    const allKeys = Object.keys(localStorage);
-    const relevantKeys = allKeys.filter(key => 
-      key.includes('flight') || key.includes('booking') || key.includes('travel')
-    );
-    
-    if (relevantKeys.length > 0) {
-      console.log("Found relevant localStorage keys:", relevantKeys);
-      relevantKeys.forEach(key => {
-        try {
-          const data = localStorage.getItem(key);
-          console.log(`${key}:`, data ? JSON.parse(data) : null);
-        } catch {
-          console.log(`${key} (raw):`, localStorage.getItem(key));
+        const response = await fetch('/api/validate-payment-token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ token })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.valid) {
+            setBookingDetails(data.data);
+            console.log('Validated booking details:', data.data);
+          } else {
+            setTokenError(data.error || 'Invalid token');
+          }
+        } else {
+          const errorData = await response.json();
+          setTokenError(errorData.error || 'Token validation failed');
         }
-      });
-    }
-  }, []);
+      } catch (error) {
+        console.error('Error validating token:', error);
+        setTokenError('Network error. Please try again.');
+      }
+
+      setIsLoading(false);
+    };
+
+    validateToken();
+  }, [searchParams]);
 
   const getServiceIcon = (serviceType: string) => {
     switch (serviceType) {
@@ -136,63 +100,36 @@ function PaymentContent() {
 
 
   const handlePayment = async () => {
+    if (!paymentToken) {
+      alert('Invalid payment session');
+      return;
+    }
+
     setIsProcessing(true);
     
     // Simulate payment processing
     await new Promise(resolve => setTimeout(resolve, 3000));
     
-    // Create order in database
+    // Create order using secure token
     try {
-      const orderData = {
-        serviceType: bookingDetails.serviceType,
-        customerName: bookingDetails.customerName || "John Doe",
-        customerEmail: bookingDetails.customerEmail || "john.doe@example.com",
-        customerPhone: bookingDetails.customerPhone || "+91 9876543210",
-        numberOfTravelers: bookingDetails.travelers,
-        totalAmount: bookingDetails.amount,
-        paymentMethod: "card",
-        status: "COMPLETED",
-        // Common traveler details
-        primaryTraveler: bookingDetails.primaryTraveler,
-        additionalTravelers: bookingDetails.additionalTravelers,
-        // Flight reservation specific details
-        ...(bookingDetails.serviceType === "flight-reservation" && {
-          tripType: bookingDetails.tripType,
-          departureAirport: bookingDetails.departureAirport,
-          arrivalAirport: bookingDetails.arrivalAirport,
-          departureDate: bookingDetails.departureDate,
-          returnDate: bookingDetails.returnDate,
-        }),
-        // Hotel booking specific details
-        ...(bookingDetails.serviceType === "hotel-booking" && {
-          destinationCity: bookingDetails.destinationCity,
-          checkInDate: bookingDetails.checkInDate,
-          checkOutDate: bookingDetails.checkOutDate,
-          numberOfHotels: bookingDetails.numberOfHotels,
-        }),
-        // Common fields
-        purpose: bookingDetails.purpose,
-        deliveryTiming: bookingDetails.deliveryTiming,
-        deliveryDate: bookingDetails.deliveryDate,
-        specialRequest: bookingDetails.specialRequest
-      };
-
-      const response = await fetch('/api/orders/create', {
+      const response = await fetch('/api/orders/create-with-token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(orderData),
+        body: JSON.stringify({
+          token: paymentToken,
+          paymentMethod: "card"
+        }),
       });
 
       if (response.ok) {
         const { orderId } = await response.json();
-        // Clear booking data
-        localStorage.removeItem("currentBooking");
         // Redirect to confirmation
         router.push(`/order-confirmation?orderId=${orderId}`);
       } else {
-        throw new Error('Failed to create order');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create order');
       }
     } catch (error) {
       console.error('Payment error:', error);
@@ -202,6 +139,71 @@ function PaymentContent() {
   };
 
 
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Validating Payment Session</h2>
+              <p className="text-gray-600">Please wait while we verify your booking details...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (tokenError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <Card className="max-w-md w-full">
+              <CardContent className="p-8 text-center">
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Shield className="h-8 w-8 text-red-600" />
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Payment Session Expired</h2>
+                <p className="text-gray-600 mb-6">{tokenError}</p>
+                <Button onClick={() => router.push('/')} className="w-full">
+                  Start New Booking
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Invalid booking details
+  if (!bookingDetails) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <Card className="max-w-md w-full">
+              <CardContent className="p-8 text-center">
+                <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Shield className="h-8 w-8 text-yellow-600" />
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">No Booking Found</h2>
+                <p className="text-gray-600 mb-6">Unable to load your booking details. Please start a new booking.</p>
+                <Button onClick={() => router.push('/')} className="w-full">
+                  Start New Booking
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -209,11 +211,11 @@ function PaymentContent() {
         <div className="mb-12">
           <Button 
             variant="outline" 
-            onClick={() => router.back()}
+            onClick={() => router.push('/')}
             className="mb-6 hover:bg-blue-50 border-blue-200 text-blue-700"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Booking
+            Start New Booking
           </Button>
           <div className="text-center">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">Complete Your Payment</h1>
@@ -236,23 +238,23 @@ function PaymentContent() {
                   <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8">
                     <div className="flex items-center space-x-4 mb-6 lg:mb-0">
                       <div className="bg-white/20 rounded-full p-4">
-                        {getServiceIcon(bookingDetails.serviceType)}
+                        {getServiceIcon(bookingDetails.service)}
                       </div>
                       <div>
-                        <h2 className="text-3xl font-bold mb-1">{getServiceName(bookingDetails.serviceType)}</h2>
+                        <h2 className="text-3xl font-bold mb-1">{getServiceName(bookingDetails.service)}</h2>
                         <p className="text-blue-100 flex items-center">
                           <CheckCircle className="h-4 w-4 mr-2" />
-                          {bookingDetails.serviceType === "hotel-booking" ? 
+                          {bookingDetails.service === "hotel-booking" ? 
                             "Real Hotel Confirmation • Embassy Approved" : 
                             "With Real PNR Number • Embassy Approved"
                           }
                         </p>
                         {/* Lead Passenger Info */}
-                        {bookingDetails.primaryTraveler && (
+                        {bookingDetails.bookingDetails?.primaryTraveler && (
                           <div className="mt-3 bg-white/10 rounded-lg px-3 py-2">
                             <div className="text-xs text-blue-200 mb-1">Lead Passenger</div>
                             <div className="text-white font-semibold">
-                              {bookingDetails.primaryTraveler.title} {bookingDetails.primaryTraveler.firstName} {bookingDetails.primaryTraveler.lastName}
+                              {bookingDetails.bookingDetails.primaryTraveler.title} {bookingDetails.bookingDetails.primaryTraveler.firstName} {bookingDetails.bookingDetails.primaryTraveler.lastName}
                             </div>
                           </div>
                         )}
@@ -261,10 +263,10 @@ function PaymentContent() {
                     
                     <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center border border-white/20">
                       <div className="text-4xl font-bold mb-2">
-                        ₹{bookingDetails.amount.toLocaleString()}
+                        ₹{bookingDetails.totalAmount.toLocaleString()}
                       </div>
                       <div className="text-blue-100 text-sm">
-                        {bookingDetails.travelers} Traveler{bookingDetails.travelers > 1 ? 's' : ''} • ₹{bookingDetails.serviceType === "hotel-booking" ? "799" : "999"} each
+                        {bookingDetails.travelers} Traveler{bookingDetails.travelers > 1 ? 's' : ''} • ₹{bookingDetails.service === "hotel-booking" ? "799" : bookingDetails.service === "travel-insurance" ? "1499" : "999"} each
                       </div>
                     </div>
                   </div>
@@ -286,10 +288,10 @@ function PaymentContent() {
                             <Hotel className="h-12 w-12 text-white bg-white/20 rounded-full p-3" />
                           </div>
                           <div className="text-2xl font-bold mb-2">
-                            {bookingDetails.destinationCity || "Hotel Destination"}
+                            {bookingDetails.bookingDetails?.destinationCity || "Hotel Destination"}
                           </div>
                           <div className="text-blue-100 text-sm">
-                            {bookingDetails.numberOfHotels || 1} Hotel{(bookingDetails.numberOfHotels || 1) > 1 ? 's' : ''} Reserved
+                            {bookingDetails.bookingDetails?.numberOfHotels || 1} Hotel{(bookingDetails.bookingDetails?.numberOfHotels || 1) > 1 ? 's' : ''} Reserved
                           </div>
                         </div>
                         
@@ -299,14 +301,14 @@ function PaymentContent() {
                             <div className="text-blue-200 text-sm mb-1">Check-in Date</div>
                             <div className="text-white font-semibold">
                               {(() => {
-                                if (bookingDetails.checkInDate) {
+                                if (bookingDetails.bookingDetails?.checkInDate) {
                                   try {
-                                    const date = new Date(bookingDetails.checkInDate);
+                                    const date = new Date(bookingDetails.bookingDetails.checkInDate);
                                     if (date.toString() !== 'Invalid Date') {
                                       return format(date, "MMM dd, yyyy");
                                     }
                                   } catch (e) {
-                                    console.log("Check-in date parsing error:", e, bookingDetails.checkInDate);
+                                    console.log("Check-in date parsing error:", e, bookingDetails.bookingDetails?.checkInDate);
                                   }
                                 }
                                 return "Date TBD";
@@ -324,14 +326,14 @@ function PaymentContent() {
                             <div className="text-blue-200 text-sm mb-1">Check-out Date</div>
                             <div className="text-white font-semibold">
                               {(() => {
-                                if (bookingDetails.checkOutDate) {
+                                if (bookingDetails.bookingDetails?.checkOutDate) {
                                   try {
-                                    const date = new Date(bookingDetails.checkOutDate);
+                                    const date = new Date(bookingDetails.bookingDetails.checkOutDate);
                                     if (date.toString() !== 'Invalid Date') {
                                       return format(date, "MMM dd, yyyy");
                                     }
                                   } catch (e) {
-                                    console.log("Check-out date parsing error:", e, bookingDetails.checkOutDate);
+                                    console.log("Check-out date parsing error:", e, bookingDetails.bookingDetails?.checkOutDate);
                                   }
                                 }
                                 return "Date TBD";
@@ -341,14 +343,14 @@ function PaymentContent() {
                         </div>
                         
                         {/* Duration calculation for hotels */}
-                        {bookingDetails.checkInDate && bookingDetails.checkOutDate && (
+                        {bookingDetails.bookingDetails?.checkInDate && bookingDetails.bookingDetails?.checkOutDate && (
                           <div className="text-center">
                             <div className="text-blue-200 text-sm">Duration</div>
                             <div className="text-white font-bold text-lg">
                               {(() => {
                                 try {
-                                  const checkIn = new Date(bookingDetails.checkInDate);
-                                  const checkOut = new Date(bookingDetails.checkOutDate);
+                                  const checkIn = new Date(bookingDetails.bookingDetails.checkInDate);
+                                  const checkOut = new Date(bookingDetails.bookingDetails.checkOutDate);
                                   const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 3600 * 24));
                                   return `${nights} night${nights > 1 ? 's' : ''}`;
                                 } catch {
@@ -366,24 +368,24 @@ function PaymentContent() {
                           {/* Departure */}
                           <div className="text-center mb-4 md:mb-0">
                             <div className="text-2xl font-bold mb-1">
-                              {bookingDetails.departureAirport?.code || "DEP"}
+                              {bookingDetails.bookingDetails?.departureAirport?.code || "DEP"}
                             </div>
                             <div className="text-blue-100 text-sm font-medium">
-                              {bookingDetails.departureAirport?.city || "Departure City"}
+                              {bookingDetails.bookingDetails?.departureAirport?.city || "Departure City"}
                             </div>
                             <div className="text-xs text-blue-200">
-                              {bookingDetails.departureAirport?.name || "International Airport"}
+                              {bookingDetails.bookingDetails?.departureAirport?.name || "International Airport"}
                             </div>
                             <div className="text-xs text-blue-200 mt-1 bg-white/10 rounded px-2 py-1">
                               {(() => {
-                                if (bookingDetails.departureDate) {
+                                if (bookingDetails.bookingDetails?.departureDate) {
                                   try {
-                                    const date = new Date(bookingDetails.departureDate);
+                                    const date = new Date(bookingDetails.bookingDetails.departureDate);
                                     if (date.toString() !== 'Invalid Date') {
                                       return `Depart: ${format(date, "MMM dd, yyyy")}`;
                                     }
                                   } catch (e) {
-                                    console.log("Date parsing error:", e, bookingDetails.departureDate);
+                                    console.log("Date parsing error:", e, bookingDetails.bookingDetails?.departureDate);
                                   }
                                 }
                                 return "Departure Date: TBD";
@@ -405,25 +407,25 @@ function PaymentContent() {
                           {/* Arrival */}
                           <div className="text-center">
                             <div className="text-2xl font-bold mb-1">
-                              {bookingDetails.arrivalAirport?.code || "ARR"}
+                              {bookingDetails.bookingDetails?.arrivalAirport?.code || "ARR"}
                             </div>
                             <div className="text-blue-100 text-sm font-medium">
-                              {bookingDetails.arrivalAirport?.city || "Arrival City"}
+                              {bookingDetails.bookingDetails?.arrivalAirport?.city || "Arrival City"}
                             </div>
                             <div className="text-xs text-blue-200">
-                              {bookingDetails.arrivalAirport?.name || "International Airport"}
+                              {bookingDetails.bookingDetails?.arrivalAirport?.name || "International Airport"}
                             </div>
-                            {bookingDetails.tripType === "round-trip" && (
+                            {bookingDetails.bookingDetails?.tripType === "round-trip" && (
                               <div className="text-xs text-blue-200 mt-1 bg-white/10 rounded px-2 py-1">
                                 {(() => {
-                                  if (bookingDetails.returnDate) {
+                                  if (bookingDetails.bookingDetails?.returnDate) {
                                     try {
-                                      const date = new Date(bookingDetails.returnDate);
+                                    const date = new Date(bookingDetails.bookingDetails.returnDate);
                                       if (date.toString() !== 'Invalid Date') {
                                         return `Return: ${format(date, "MMM dd, yyyy")}`;
                                       }
                                     } catch (e) {
-                                      console.log("Return date parsing error:", e, bookingDetails.returnDate);
+                                    console.log("Return date parsing error:", e, bookingDetails.bookingDetails?.returnDate);
                                     }
                                   }
                                   return "Return Date: TBD";
@@ -442,14 +444,14 @@ function PaymentContent() {
                           <div className="bg-white/5 rounded-lg p-3 text-center">
                             <div className="text-blue-200 mb-1">Destination</div>
                             <div className="text-white font-semibold">
-                              {bookingDetails.destinationCity || "TBD"}
+                              {bookingDetails.bookingDetails?.destinationCity || "TBD"}
                             </div>
                           </div>
                           
                           <div className="bg-white/5 rounded-lg p-3 text-center">
                             <div className="text-blue-200 mb-1">Hotels</div>
                             <div className="text-white font-semibold">
-                              {bookingDetails.numberOfHotels || 1} Hotel{(bookingDetails.numberOfHotels || 1) > 1 ? 's' : ''}
+                              {bookingDetails.bookingDetails?.numberOfHotels || 1} Hotel{(bookingDetails.bookingDetails?.numberOfHotels || 1) > 1 ? 's' : ''}
                             </div>
                           </div>
                           
@@ -463,7 +465,7 @@ function PaymentContent() {
                           <div className="bg-white/5 rounded-lg p-3 text-center">
                             <div className="text-blue-200 mb-1">Delivery</div>
                             <div className="text-white font-semibold">
-                              {bookingDetails.deliveryTiming === "immediate" ? "20-60 min" : "Later date"}
+                              {bookingDetails.bookingDetails?.deliveryTiming === "immediate" ? "20-60 min" : "Later date"}
                             </div>
                           </div>
                         </>
@@ -472,14 +474,14 @@ function PaymentContent() {
                           <div className="bg-white/5 rounded-lg p-3 text-center">
                             <div className="text-blue-200 mb-1">Trip Type</div>
                             <div className="text-white font-semibold capitalize">
-                              {bookingDetails.tripType ? bookingDetails.tripType.replace("-", " ") : "One Way"}
+                              {bookingDetails.bookingDetails?.tripType ? bookingDetails.bookingDetails.tripType.replace("-", " ") : "One Way"}
                             </div>
                           </div>
                           
                           <div className="bg-white/5 rounded-lg p-3 text-center">
                             <div className="text-blue-200 mb-1">Purpose</div>
                             <div className="text-white font-semibold">
-                              {bookingDetails.purpose || "Business"}
+                              {bookingDetails.bookingDetails?.purpose || "Business"}
                             </div>
                           </div>
                           
@@ -493,7 +495,7 @@ function PaymentContent() {
                           <div className="bg-white/5 rounded-lg p-3 text-center">
                             <div className="text-blue-200 mb-1">Delivery</div>
                             <div className="text-white font-semibold">
-                              {bookingDetails.deliveryTiming || "15-30 min"}
+                              {bookingDetails.bookingDetails?.deliveryTiming || "15-30 min"}
                             </div>
                           </div>
                         </>
@@ -503,13 +505,13 @@ function PaymentContent() {
                     {/* Data Source Indicator */}
                     <div className="mt-4 text-center">
                       <div className="text-xs text-blue-300">
-                        {bookingDetails.serviceType === "hotel-booking" ? (
-                          bookingDetails.destinationCity && bookingDetails.checkInDate ? 
-                            "✓ Hotel booking details loaded from form" : 
+                        {bookingDetails.service === "hotel-booking" ? (
+                          bookingDetails.bookingDetails?.destinationCity && bookingDetails.bookingDetails?.checkInDate ? 
+                            "✓ Hotel booking details loaded from secure session" : 
                             "⚠ Using sample data - complete booking form for actual details"
                         ) : (
-                          bookingDetails.departureAirport && bookingDetails.arrivalAirport ? 
-                            "✓ Flight details loaded from booking form" : 
+                          bookingDetails.bookingDetails?.departureAirport && bookingDetails.bookingDetails?.arrivalAirport ? 
+                            "✓ Flight details loaded from secure session" : 
                             "⚠ Using sample data - complete booking form for actual details"
                         )}
                       </div>
@@ -520,7 +522,7 @@ function PaymentContent() {
                   
                   {/* Service Features */}
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-                    {bookingDetails.serviceType === "hotel-booking" ? (
+                    {bookingDetails.service === "hotel-booking" ? (
                       <>
                         <div className="flex items-center space-x-2">
                           <CheckCircle className="h-4 w-4 text-green-300" />
@@ -579,7 +581,7 @@ function PaymentContent() {
                     ) : (
                       <>
                         <Lock className="h-6 w-6 mr-3" />
-                        Pay ₹{bookingDetails.amount.toLocaleString()} Securely
+                        Pay ₹{bookingDetails.totalAmount.toLocaleString()} Securely
                       </>
                     )}
                   </Button>
@@ -604,15 +606,15 @@ function PaymentContent() {
             <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
               <CardTitle className="flex items-center text-xl">
                 <Shield className="h-6 w-6 mr-3 text-blue-600" />
-                Other Passengers ({bookingDetails.additionalTravelers?.length || 0} Companions)
+                Other Passengers ({bookingDetails.bookingDetails?.additionalTravelers?.length || 0} Companions)
               </CardTitle>
             </CardHeader>
             <CardContent className="p-8">
               {/* Optimized 3x3 Grid for Desktop, 1 Column for Mobile - Only Additional Travelers */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
                 {/* Additional Travelers in 3x3 Grid - Excluding Primary */}
-                {bookingDetails.additionalTravelers && bookingDetails.additionalTravelers.length > 0 ? (
-                  bookingDetails.additionalTravelers.map((traveler, index) => (
+                {bookingDetails.bookingDetails?.additionalTravelers && bookingDetails.bookingDetails.additionalTravelers.length > 0 ? (
+                  bookingDetails.bookingDetails.additionalTravelers.map((traveler, index) => (
                     <div key={index} className="bg-gray-50 border border-gray-200 rounded-xl p-6 hover:shadow-lg hover:bg-gray-100 transition-all duration-200 relative overflow-hidden">
                       <div className="absolute top-0 right-0 w-16 h-16 bg-gray-200/30 rounded-full transform translate-x-6 -translate-y-6"></div>
                       <div className="relative z-10">
@@ -638,49 +640,49 @@ function PaymentContent() {
                       This booking only includes the lead passenger shown above.
                     </div>
                     <div className="text-xs text-gray-500">
-                      Total Travelers: {bookingDetails.travelers} | Additional Passengers: {bookingDetails.additionalTravelers?.length || 0}
+                      Total Travelers: {bookingDetails.travelers} | Additional Passengers: {bookingDetails.bookingDetails?.additionalTravelers?.length || 0}
                     </div>
                   </div>
                 )}
               </div>
               
               {/* Contact Information */}
-              {(bookingDetails.customerName || bookingDetails.customerEmail || bookingDetails.customerPhone) && (
+              {(bookingDetails.bookingDetails?.customerName || bookingDetails.bookingDetails?.customerEmail || bookingDetails.bookingDetails?.customerPhone) && (
                 <div className="mt-12 pt-8 border-t border-gray-200">
                   <h4 className="text-xl font-bold text-gray-900 mb-8 flex items-center">
                     <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-4">
                       <span className="text-purple-600 font-bold text-lg">
-                        {bookingDetails.customerName ? bookingDetails.customerName.charAt(0) : 'C'}
+                      {bookingDetails.bookingDetails?.customerName ? bookingDetails.bookingDetails.customerName.charAt(0) : 'C'}
                       </span>
                     </div>
                     Contact Information
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {bookingDetails.customerName && (
+                    {bookingDetails.bookingDetails?.customerName && (
                       <div className="bg-purple-50 rounded-xl p-6 border border-purple-200 hover:shadow-lg transition-shadow duration-200">
                         <div className="text-sm text-purple-600 font-bold mb-3 flex items-center">
                           <div className="w-4 h-4 bg-purple-600 rounded-full mr-2"></div>
                           Contact Person
                         </div>
-                        <div className="text-xl font-bold text-gray-900">{bookingDetails.customerName}</div>
+                        <div className="text-xl font-bold text-gray-900">{bookingDetails.bookingDetails?.customerName}</div>
                       </div>
                     )}
-                    {bookingDetails.customerEmail && (
+                    {bookingDetails.bookingDetails?.customerEmail && (
                       <div className="bg-blue-50 rounded-xl p-6 border border-blue-200 hover:shadow-lg transition-shadow duration-200">
                         <div className="text-sm text-blue-600 font-bold mb-3 flex items-center">
                           <div className="w-4 h-4 bg-blue-600 rounded-full mr-2"></div>
                           Email Address
                         </div>
-                        <div className="font-bold text-gray-900 break-all text-lg">{bookingDetails.customerEmail}</div>
+                        <div className="font-bold text-gray-900 break-all text-lg">{bookingDetails.bookingDetails?.customerEmail}</div>
                       </div>
                     )}
-                    {bookingDetails.customerPhone && (
+                    {bookingDetails.bookingDetails?.customerPhone && (
                       <div className="bg-green-50 rounded-xl p-6 border border-green-200 hover:shadow-lg transition-shadow duration-200">
                         <div className="text-sm text-green-600 font-bold mb-3 flex items-center">
                           <div className="w-4 h-4 bg-green-600 rounded-full mr-2"></div>
                           Phone Number
                         </div>
-                        <div className="text-xl font-bold text-gray-900">{bookingDetails.customerPhone}</div>
+                        <div className="text-xl font-bold text-gray-900">{bookingDetails.bookingDetails?.customerPhone}</div>
                       </div>
                     )}
                   </div>
