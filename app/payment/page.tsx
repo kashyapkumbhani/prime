@@ -25,7 +25,48 @@ function PaymentContent() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [tokenError, setTokenError] = useState<string | null>(null);
-  const [bookingDetails, setBookingDetails] = useState<any>(null);
+  const [bookingDetails, setBookingDetails] = useState<{
+    service: string;
+    serviceType?: string;
+    travelers: number;
+    totalAmount: number;
+    bookingDetails?: {
+      primaryTraveler?: {
+        title: string;
+        firstName: string;
+        lastName: string;
+      };
+      destinationCity?: string;
+      numberOfHotels?: number;
+      checkInDate?: string;
+      checkOutDate?: string;
+      departureAirport?: {
+        code: string;
+        city: string;
+        name?: string;
+      };
+      arrivalAirport?: {
+        code: string;
+        city: string;
+        name?: string;
+      };
+      departureDate?: string;
+      returnDate?: string;
+      tripType?: string;
+      purpose?: string;
+      deliveryTiming?: string;
+      additionalTravelers?: Array<{
+        title: string;
+        firstName: string;
+        lastName: string;
+        [key: string]: unknown;
+      }>;
+      customerName?: string;
+      customerEmail?: string;
+      customerPhone?: string;
+      [key: string]: unknown;
+    };
+  } | null>(null);
   const [paymentToken, setPaymentToken] = useState<string | null>(null);
 
   useEffect(() => {

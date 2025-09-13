@@ -335,7 +335,7 @@ export default function PrivacyPolicyPage() {
                 <div className="space-y-4">
                   <p className="text-green-700">
                     If you have any questions about this Privacy Policy or how we handle your personal information, 
-                    please don't hesitate to contact us.
+                    please don&apos;t hesitate to contact us.
                   </p>
                   
                   <div className="grid md:grid-cols-3 gap-4">

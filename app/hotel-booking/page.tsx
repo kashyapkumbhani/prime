@@ -61,7 +61,7 @@ export default function HotelBookingPage() {
   const [deliveryDate, setDeliveryDate] = useState<Date>();
   
   // Step 4: Purpose & Special Requests
-  const [purpose, setPurpose] = useState("");
+  const [purpose] = useState("");
   const [specialRequest, setSpecialRequest] = useState("");
   
   // Date picker states

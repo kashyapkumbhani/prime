@@ -624,7 +624,7 @@ export default function TravelInsurancePage() {
                       travelEndDate: travelEndDate,
                       tripDuration: tripDuration,
                       coverageType: coverageType,
-                      travelPurpose: travelPurpose,
+                      travelPurpose: purpose,
                       preExistingConditions: preExistingConditions,
                       specialRequests: specialRequests,
                       primaryTraveler: primaryTraveler,

@@ -28,7 +28,7 @@ export default function TermsOfServicePage() {
               Terms of Service
             </h1>
             <p className="text-xl text-gray-600 mb-8">
-              Please read these terms and conditions carefully before using PrimeDummyTicket's 
+              Please read these terms and conditions carefully before using PrimeDummyTicket&apos;s
               visa document services. By using our services, you agree to these terms.
             </p>
             <div className="flex items-center justify-center text-sm text-gray-500">
@@ -336,7 +336,7 @@ export default function TermsOfServicePage() {
                   <div>
                     <h4 className="font-semibold text-gray-800 mb-3">Limitation of Liability</h4>
                     <p className="text-gray-600 text-sm">
-                      PrimeDummyTicket's liability is limited to the amount paid for our services. 
+                      PrimeDummyTicket&apos;s liability is limited to the amount paid for our services.
                       We are not liable for any indirect, incidental, or consequential damages arising 
                       from the use of our services, including but not limited to visa rejection, 
                       travel delays, or financial losses.

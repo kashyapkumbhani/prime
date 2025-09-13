@@ -1,13 +1,22 @@
 import crypto from 'crypto';
 
 // In-memory token store (in production, use Redis or database)
-const tokenStore = new Map<string, { data: any; expires: number; used: boolean }>();
+interface TokenData {
+  service: string;
+  travelers: number;
+  totalAmount: number;
+  bookingDetails: Record<string, unknown>;
+  createdAt: string;
+  sessionId: string;
+}
+
+const tokenStore = new Map<string, { data: TokenData; expires: number; used: boolean }>();
 
 export function generateSecureToken(): string {
   return crypto.randomBytes(32).toString('hex');
 }
 
-export function createPaymentToken(bookingData: any): string {
+export function createPaymentToken(bookingData: TokenData): string {
   const token = generateSecureToken();
   const expires = Date.now() + (30 * 60 * 1000); // 30 minutes expiry
   
@@ -23,7 +32,7 @@ export function createPaymentToken(bookingData: any): string {
   return token;
 }
 
-export function validatePaymentToken(token: string): { valid: boolean; data?: any; error?: string } {
+export function validatePaymentToken(token: string): { valid: boolean; data?: TokenData; error?: string } {
   const tokenData = tokenStore.get(token);
   
   if (!tokenData) {

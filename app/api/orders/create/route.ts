@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       // Common fields
       purpose,
       deliveryTiming,
-      deliveryDate,
+      // deliveryDate,
       specialRequest
     } = orderData;
 

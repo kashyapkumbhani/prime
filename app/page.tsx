@@ -411,7 +411,7 @@ export default function Home() {
                   }
                 ].map((testimonial, index) => (
                   <div key={index} className="text-center">
-                    <div className="text-gray-600 mb-4 italic">"{testimonial.text}"</div>
+                    <div className="text-gray-600 mb-4 italic">&quot;{testimonial.text}&quot;</div>
                     <div className="font-bold text-gray-900">{testimonial.author}</div>
                     <div className="text-sm text-gray-500">{testimonial.country}</div>
                   </div>

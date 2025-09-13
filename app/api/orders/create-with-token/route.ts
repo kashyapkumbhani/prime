@@ -26,13 +26,21 @@ export async function POST(request: NextRequest) {
     }
     
     const tokenData = validation.data;
+    
+    if (!tokenData) {
+      return NextResponse.json(
+        { error: 'No token data found' },
+        { status: 400 }
+      );
+    }
+    
     console.log('Creating order with token data:', tokenData);
     
     // Mark token as used to prevent reuse
     markTokenAsUsed(token);
     
     // Map service type to enum and generate readable order IDs
-    const serviceTypeMap = {
+    const serviceTypeMap: Record<string, string> = {
       'flight-reservation': 'FLIGHT_RESERVATION',
       'hotel-booking': 'HOTEL_BOOKING',
       'travel-insurance': 'TRAVEL_INSURANCE'
@@ -81,15 +89,25 @@ export async function POST(request: NextRequest) {
 
     const customOrderId = await generateOrderId(tokenData.service);
 
+    // Type assertion for bookingDetails since we know it contains our data
+    const bookingDetails = tokenData.bookingDetails as {
+      customerName?: string;
+      customerEmail: string;
+      customerPhone?: string;
+      primaryTraveler?: { title: string; firstName: string; lastName: string };
+      additionalTravelers?: { title: string; firstName: string; lastName: string }[];
+      [key: string]: unknown;
+    };
+    
     // First, create or find the customer
     const customer = await prisma.customer.upsert({
-      where: { email: tokenData.bookingDetails.customerEmail },
+      where: { email: bookingDetails.customerEmail as string },
       update: {
-        phone: tokenData.bookingDetails.customerPhone
+        phone: bookingDetails.customerPhone as string
       },
       create: {
-        email: tokenData.bookingDetails.customerEmail,
-        phone: tokenData.bookingDetails.customerPhone
+        email: bookingDetails.customerEmail as string,
+        phone: bookingDetails.customerPhone as string
       }
     });
 
@@ -97,11 +115,11 @@ export async function POST(request: NextRequest) {
     const order = await prisma.order.create({
       data: {
         id: customOrderId,
-        serviceType: serviceTypeMap[tokenData.service],
+        serviceType: serviceTypeMap[tokenData.service] as 'FLIGHT_RESERVATION' | 'HOTEL_BOOKING' | 'TRAVEL_INSURANCE',
         customerId: customer.id,
-        customerName: tokenData.bookingDetails.customerName || "Unknown Customer",
-        customerEmail: tokenData.bookingDetails.customerEmail,
-        customerPhone: tokenData.bookingDetails.customerPhone,
+        customerName: bookingDetails.customerName || "Unknown Customer",
+        customerEmail: bookingDetails.customerEmail,
+        customerPhone: bookingDetails.customerPhone as string,
         numberOfTravelers: tokenData.travelers,
         totalAmount: tokenData.totalAmount,
         paymentMethod: paymentMethod,
@@ -112,14 +130,14 @@ export async function POST(request: NextRequest) {
         travelers: {
           create: [
             // Primary traveler
-            ...(tokenData.bookingDetails.primaryTraveler ? [{
-              title: tokenData.bookingDetails.primaryTraveler.title,
-              firstName: tokenData.bookingDetails.primaryTraveler.firstName,
-              lastName: tokenData.bookingDetails.primaryTraveler.lastName,
+            ...(bookingDetails.primaryTraveler ? [{
+              title: bookingDetails.primaryTraveler.title,
+              firstName: bookingDetails.primaryTraveler.firstName,
+              lastName: bookingDetails.primaryTraveler.lastName,
               isPrimary: true
             }] : []),
             // Additional travelers
-            ...(tokenData.bookingDetails.additionalTravelers || []).map(traveler => ({
+            ...(bookingDetails.additionalTravelers || []).map(traveler => ({
               title: traveler.title,
               firstName: traveler.firstName,
               lastName: traveler.lastName,
@@ -132,20 +150,20 @@ export async function POST(request: NextRequest) {
         ...(tokenData.service === 'flight-reservation' && {
           flightBooking: {
             create: {
-              tripType: tokenData.bookingDetails.tripType || 'one-way',
-              departureAirport: tokenData.bookingDetails.departureAirport ? 
-                `${tokenData.bookingDetails.departureAirport.city} (${tokenData.bookingDetails.departureAirport.code})` : 
+              tripType: (bookingDetails.tripType as string) || 'one-way',
+              departureAirport: (bookingDetails.departureAirport as { city: string; code: string })?.city ? 
+                `${(bookingDetails.departureAirport as { city: string; code: string }).city} (${(bookingDetails.departureAirport as { city: string; code: string }).code})` : 
                 'Unknown',
-              arrivalAirport: tokenData.bookingDetails.arrivalAirport ? 
-                `${tokenData.bookingDetails.arrivalAirport.city} (${tokenData.bookingDetails.arrivalAirport.code})` : 
+              arrivalAirport: (bookingDetails.arrivalAirport as { city: string; code: string })?.city ? 
+                `${(bookingDetails.arrivalAirport as { city: string; code: string }).city} (${(bookingDetails.arrivalAirport as { city: string; code: string }).code})` : 
                 'Unknown',
-              departureDate: tokenData.bookingDetails.departureDate ? 
-                new Date(tokenData.bookingDetails.departureDate) : new Date(),
-              returnDate: tokenData.bookingDetails.returnDate ? 
-                new Date(tokenData.bookingDetails.returnDate) : null,
-              purpose: tokenData.bookingDetails.purpose || 'Visa Application',
-              specialRequests: tokenData.bookingDetails.specialRequest,
-              deliveryTiming: tokenData.bookingDetails.deliveryTiming || 'now'
+              departureDate: bookingDetails.departureDate ? 
+                new Date(bookingDetails.departureDate as string) : new Date(),
+              returnDate: bookingDetails.returnDate ? 
+                new Date(bookingDetails.returnDate as string) : null,
+              purpose: (bookingDetails.purpose as string) || 'Visa Application',
+              specialRequests: bookingDetails.specialRequest as string,
+              deliveryTiming: (bookingDetails.deliveryTiming as string) || 'now'
             }
           }
         }),
@@ -153,15 +171,15 @@ export async function POST(request: NextRequest) {
         ...(tokenData.service === 'hotel-booking' && {
           hotelBooking: {
             create: {
-              destinationCity: tokenData.bookingDetails.destinationCity || 'Unknown',
-              checkInDate: tokenData.bookingDetails.checkInDate ? 
-                new Date(tokenData.bookingDetails.checkInDate) : new Date(),
-              checkOutDate: tokenData.bookingDetails.checkOutDate ? 
-                new Date(tokenData.bookingDetails.checkOutDate) : new Date(),
-              numberOfRooms: tokenData.bookingDetails.numberOfHotels || 1,
+              destinationCity: (bookingDetails.destinationCity as string) || 'Unknown',
+              checkInDate: bookingDetails.checkInDate ? 
+                new Date(bookingDetails.checkInDate as string) : new Date(),
+              checkOutDate: bookingDetails.checkOutDate ? 
+                new Date(bookingDetails.checkOutDate as string) : new Date(),
+              numberOfRooms: (bookingDetails.numberOfHotels as number) || 1,
               numberOfGuests: tokenData.travelers,
-              purpose: tokenData.bookingDetails.purpose || 'Visa Application',
-              specialRequests: tokenData.bookingDetails.specialRequest
+              purpose: (bookingDetails.purpose as string) || 'Visa Application',
+              specialRequests: bookingDetails.specialRequest as string
             }
           }
         }),
@@ -169,15 +187,15 @@ export async function POST(request: NextRequest) {
         ...(tokenData.service === 'travel-insurance' && {
           insuranceBooking: {
             create: {
-              destinationCountry: tokenData.bookingDetails.destinationCountry || 'Unknown',
-              travelStartDate: tokenData.bookingDetails.travelStartDate ? 
-                new Date(tokenData.bookingDetails.travelStartDate) : new Date(),
-              travelEndDate: tokenData.bookingDetails.travelEndDate ? 
-                new Date(tokenData.bookingDetails.travelEndDate) : new Date(),
-              coverageType: tokenData.bookingDetails.coverageType || 'basic',
-              purpose: tokenData.bookingDetails.travelPurpose || 'Tourism',
-              preExistingConditions: tokenData.bookingDetails.preExistingConditions,
-              specialRequests: tokenData.bookingDetails.specialRequests
+              destinationCountry: (bookingDetails.destinationCountry as string) || 'Unknown',
+              travelStartDate: bookingDetails.travelStartDate ? 
+                new Date(bookingDetails.travelStartDate as string) : new Date(),
+              travelEndDate: bookingDetails.travelEndDate ? 
+                new Date(bookingDetails.travelEndDate as string) : new Date(),
+              coverageType: (bookingDetails.coverageType as string) || 'basic',
+              purpose: (bookingDetails.travelPurpose as string) || 'Tourism',
+              preExistingConditions: bookingDetails.preExistingConditions as string,
+              specialRequests: bookingDetails.specialRequests as string
             }
           }
         })
