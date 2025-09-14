@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { MapPin, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Airport {
@@ -24,8 +24,7 @@ export function AirportNativeSelect({
   value,
   onChange,
   airports,
-  placeholder = "Select Airport",
-  label = "Select Airport"
+  placeholder = "Select Airport"
 }: AirportNativeSelectProps) {
   const [searchMode, setSearchMode] = useState(false);
   const [searchValue, setSearchValue] = useState("");

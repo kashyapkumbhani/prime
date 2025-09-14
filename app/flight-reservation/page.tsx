@@ -14,7 +14,7 @@ import { Progress } from "@/components/ui/progress";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { AirportDropdown } from "@/components/ui/airport-dropdown";
-import { CheckIcon, Plane, ArrowRight, ArrowLeft, CalendarIcon, MapPin, Users, Clock, FileText, Shield, Globe } from "lucide-react";
+import { CheckIcon, Plane, ArrowRight, ArrowLeft, CalendarIcon, Users, Clock, FileText, Shield, Globe } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import airportsData from "@/data/airports.json";

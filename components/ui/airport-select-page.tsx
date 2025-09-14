@@ -105,7 +105,7 @@ export function AirportSelectPage({
           </div>
         ) : filteredAirports.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full p-8 text-center">
-            <p className="text-gray-500">No airports found for "{searchValue}"</p>
+            <p className="text-gray-500">No airports found for &quot;{searchValue}&quot;</p>
           </div>
         ) : (
           <div className="divide-y divide-gray-200">
