@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { MobileAirportDropdown } from "@/components/ui/mobile-airport-dropdown";
+import { AirportDropdown } from "@/components/ui/airport-dropdown";
 import { CheckIcon, Plane, ArrowRight, ArrowLeft, CalendarIcon, MapPin, Users, Clock, FileText, Shield, Globe } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -201,7 +201,7 @@ export default function FlightReservationPage() {
                         <Label className="text-sm font-medium mb-2 block">
                           Departure Airport (From) <span className="text-red-500">*</span>
                         </Label>
-                        <MobileAirportDropdown
+                        <AirportDropdown
                           value={departureAirport}
                           onChange={setDepartureAirport}
                           airports={airports}
@@ -215,7 +215,7 @@ export default function FlightReservationPage() {
                         <Label className="text-sm font-medium mb-2 block">
                           Arrival Airport (To) <span className="text-red-500">*</span>
                         </Label>
-                        <MobileAirportDropdown
+                        <AirportDropdown
                           value={arrivalAirport}
                           onChange={setArrivalAirport}
                           airports={airports}
