@@ -1,0 +1,76 @@
+/* iOS-specific fixes for better mobile experience */
+
+/* Prevent iOS zoom on input focus */
+@supports (-webkit-touch-callout: none) {
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  input[type="search"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* Better touch interaction */
+.touch-manipulation {
+  touch-action: manipulation;
+}
+
+/* Smooth scrolling for iOS */
+.-webkit-overflow-scrolling-touch {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Remove tap highlight */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent text selection on buttons */
+button {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Fix for iOS drawer/modal scroll issues */
+.drawer-open {
+  position: fixed;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Better button states for touch devices */
+@media (hover: none) and (pointer: coarse) {
+  button:active {
+    transform: scale(0.98);
+  }
+  
+  /* Remove hover states on touch devices */
+  button:hover {
+    background-color: inherit;
+  }
+}
+
+/* iOS safe area insets */
+.safe-area-inset {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Prevent bounce scrolling on iOS */
+.no-bounce {
+  overscroll-behavior: contain;
+}
+
+/* Fix for iOS input zoom */
+@media screen and (max-width: 768px) {
+  input:focus,
+  select:focus,
+  textarea:focus {
+    font-size: 16px !important;
+    transform: scale(1) !important;
+  }
+}

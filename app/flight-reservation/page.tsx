@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { MobileAirportDropdown } from "@/components/ui/mobile-airport-dropdown";
 import { CheckIcon, Plane, ArrowRight, ArrowLeft, CalendarIcon, MapPin, Users, Clock, FileText, Shield, Globe } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -52,28 +52,10 @@ export default function FlightReservationPage() {
   const [deliveryTiming, setDeliveryTiming] = useState<"now" | "later">("now");
   const [purpose, setPurpose] = useState("");
   const [specialRequest, setSpecialRequest] = useState("");
-  const [isDepartureOpen, setIsDepartureOpen] = useState(false);
-  const [isArrivalOpen, setIsArrivalOpen] = useState(false);
-  const [departureSearchValue, setDepartureSearchValue] = useState("");
-  const [arrivalSearchValue, setArrivalSearchValue] = useState("");
   const [isDepartureDateOpen, setIsDepartureDateOpen] = useState(false);
   const [isReturnDateOpen, setIsReturnDateOpen] = useState(false);
 
   const airports: Airport[] = airportsData;
-  
-  const filteredDepartureAirports = airports.filter(airport => 
-    airport.name.toLowerCase().includes(departureSearchValue.toLowerCase()) ||
-    airport.city.toLowerCase().includes(departureSearchValue.toLowerCase()) ||
-    airport.country.toLowerCase().includes(departureSearchValue.toLowerCase()) ||
-    airport.code.toLowerCase().includes(departureSearchValue.toLowerCase())
-  );
-
-  const filteredArrivalAirports = airports.filter(airport => 
-    airport.name.toLowerCase().includes(arrivalSearchValue.toLowerCase()) ||
-    airport.city.toLowerCase().includes(arrivalSearchValue.toLowerCase()) ||
-    airport.country.toLowerCase().includes(arrivalSearchValue.toLowerCase()) ||
-    airport.code.toLowerCase().includes(arrivalSearchValue.toLowerCase())
-  );
 
   const steps = [
     { number: 1, title: "Flight Details", icon: Plane },
@@ -219,63 +201,13 @@ export default function FlightReservationPage() {
                         <Label className="text-sm font-medium mb-2 block">
                           Departure Airport (From) <span className="text-red-500">*</span>
                         </Label>
-                        <Popover open={isDepartureOpen} onOpenChange={setIsDepartureOpen}>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              aria-expanded={isDepartureOpen}
-                              className="w-full justify-between h-12 text-left"
-                            >
-                              <div className="flex-1 truncate">
-                                {departureAirport ? (
-                                  <span className="block truncate">
-                                    {departureAirport.name} - {departureAirport.city}, {departureAirport.country}
-                                  </span>
-                                ) : (
-                                  <span className="text-gray-500">Search Airport</span>
-                                )}
-                              </div>
-                              <MapPin className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-[400px] p-0" align="start">
-                            <Command>
-                              <CommandInput
-                                placeholder="Type 2 or more characters for results..."
-                                value={departureSearchValue}
-                                onValueChange={setDepartureSearchValue}
-                              />
-                              <CommandEmpty>No airports found.</CommandEmpty>
-                              <CommandGroup>
-                                <CommandList>
-                                  {filteredDepartureAirports.slice(0, 10).map((airport) => (
-                                    <CommandItem
-                                      key={airport.code}
-                                      value={`${airport.name} ${airport.city} ${airport.country}`}
-                                      onSelect={() => {
-                                        setDepartureAirport(airport);
-                                        setIsDepartureOpen(false);
-                                        setDepartureSearchValue("");
-                                      }}
-                                    >
-                                      <CheckIcon
-                                        className={cn(
-                                          "mr-2 h-4 w-4",
-                                          departureAirport?.code === airport.code ? "opacity-100" : "opacity-0"
-                                        )}
-                                      />
-                                      <div className="flex-1">
-                                        <div className="font-medium">{airport.name}</div>
-                                        <div className="text-sm text-gray-500">{airport.city}, {airport.country} ({airport.code})</div>
-                                      </div>
-                                    </CommandItem>
-                                  ))}
-                                </CommandList>
-                              </CommandGroup>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
+                        <MobileAirportDropdown
+                          value={departureAirport}
+                          onChange={setDepartureAirport}
+                          airports={airports}
+                          placeholder="Search Departure Airport"
+                          label="Select Departure Airport"
+                        />
                         <p className="text-xs text-gray-500 mt-1">Type 2 or more characters for results.</p>
                       </div>
 
@@ -283,63 +215,13 @@ export default function FlightReservationPage() {
                         <Label className="text-sm font-medium mb-2 block">
                           Arrival Airport (To) <span className="text-red-500">*</span>
                         </Label>
-                        <Popover open={isArrivalOpen} onOpenChange={setIsArrivalOpen}>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              aria-expanded={isArrivalOpen}
-                              className="w-full justify-between h-12 text-left"
-                            >
-                              <div className="flex-1 truncate">
-                                {arrivalAirport ? (
-                                  <span className="block truncate">
-                                    {arrivalAirport.name} - {arrivalAirport.city}, {arrivalAirport.country}
-                                  </span>
-                                ) : (
-                                  <span className="text-gray-500">Search Airport</span>
-                                )}
-                              </div>
-                              <MapPin className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-[400px] p-0" align="start">
-                            <Command>
-                              <CommandInput 
-                                placeholder="Type 2 or more characters for results..."
-                                value={arrivalSearchValue}
-                                onValueChange={setArrivalSearchValue}
-                              />
-                              <CommandEmpty>No airports found.</CommandEmpty>
-                              <CommandGroup>
-                                <CommandList>
-                                  {filteredArrivalAirports.slice(0, 10).map((airport) => (
-                                    <CommandItem
-                                      key={airport.code}
-                                      value={`${airport.name} ${airport.city} ${airport.country}`}
-                                      onSelect={() => {
-                                        setArrivalAirport(airport);
-                                        setIsArrivalOpen(false);
-                                        setArrivalSearchValue("");
-                                      }}
-                                    >
-                                      <CheckIcon
-                                        className={cn(
-                                          "mr-2 h-4 w-4",
-                                          arrivalAirport?.code === airport.code ? "opacity-100" : "opacity-0"
-                                        )}
-                                      />
-                                      <div className="flex-1">
-                                        <div className="font-medium">{airport.name}</div>
-                                        <div className="text-sm text-gray-500">{airport.city}, {airport.country} ({airport.code})</div>
-                                      </div>
-                                    </CommandItem>
-                                  ))}
-                                </CommandList>
-                              </CommandGroup>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
+                        <MobileAirportDropdown
+                          value={arrivalAirport}
+                          onChange={setArrivalAirport}
+                          airports={airports}
+                          placeholder="Search Arrival Airport"
+                          label="Select Arrival Airport"
+                        />
                         <p className="text-xs text-gray-500 mt-1">Type 2 or more characters for results.</p>
                       </div>
                     </div>
