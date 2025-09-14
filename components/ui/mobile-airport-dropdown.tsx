@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import ReactDOM from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CheckIcon, MapPin, X, Search } from "lucide-react";
@@ -46,6 +47,7 @@ export function MobileAirportDropdown({
   const [searchValue, setSearchValue] = useState("");
   const [isMobile, setIsMobile] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -61,19 +63,23 @@ export function MobileAirportDropdown({
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Prevent body scroll when modal is open on iOS
+  // Handle visual viewport changes (keyboard appearance) on iOS
   useEffect(() => {
-    if (open && isIOS) {
-      const scrollY = window.scrollY;
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.width = '100%';
-      
+    if (open && isIOS && 'visualViewport' in window) {
+      const handleViewportChange = () => {
+        const viewport = window.visualViewport;
+        if (viewport) {
+          const keyboardHeight = window.innerHeight - viewport.height;
+          setKeyboardHeight(keyboardHeight);
+        }
+      };
+
+      window.visualViewport?.addEventListener('resize', handleViewportChange);
+      window.visualViewport?.addEventListener('scroll', handleViewportChange);
+
       return () => {
-        document.body.style.position = '';
-        document.body.style.top = '';
-        document.body.style.width = '';
-        window.scrollTo(0, scrollY);
+        window.visualViewport?.removeEventListener('resize', handleViewportChange);
+        window.visualViewport?.removeEventListener('scroll', handleViewportChange);
       };
     }
   }, [open, isIOS]);
@@ -116,8 +122,8 @@ export function MobileAirportDropdown({
   );
 
   const searchContent = (
-    <>
-      <div className="relative">
+    <div className="flex flex-col h-full">
+      <div className="relative flex-shrink-0">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         <Input
           ref={inputRef}
@@ -125,7 +131,12 @@ export function MobileAirportDropdown({
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
           className="pl-10 pr-10 h-12"
-          autoFocus={!isMobile}
+          autoFocus={false} // Disable auto-focus to prevent keyboard issues
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
+          inputMode="text"
         />
         {searchValue && (
           <Button
@@ -139,7 +150,7 @@ export function MobileAirportDropdown({
         )}
       </div>
       
-      <div className="mt-4 flex-1 overflow-hidden">
+      <div className="mt-4 flex-1 overflow-hidden min-h-0">
         {searchValue.length < 2 ? (
           <p className="text-sm text-gray-500 text-center py-8">
             Type at least 2 characters to search airports
@@ -149,7 +160,7 @@ export function MobileAirportDropdown({
             No airports found
           </p>
         ) : (
-          <div className="max-h-[50vh] overflow-y-auto -mx-4 px-4 -webkit-overflow-scrolling-touch">
+          <div className="h-full overflow-y-auto -mx-4 px-4 -webkit-overflow-scrolling-touch overscroll-contain">
             {filteredAirports.slice(0, 20).map((airport) => (
               <button
                 key={airport.code}
@@ -189,34 +200,149 @@ export function MobileAirportDropdown({
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 
   if (isMobile) {
+    const modalContent = open ? (
+      <div 
+        className="fixed inset-0 z-[9999] flex items-end" 
+        style={{ 
+          position: 'fixed',
+          bottom: keyboardHeight > 0 ? `${keyboardHeight}px` : '0'
+        }}
+      >
+        {/* Backdrop */}
+        <div 
+          className="absolute inset-0 bg-black/50 animate-in fade-in-0"
+          onClick={() => setOpen(false)}
+          style={{ bottom: keyboardHeight > 0 ? `-${keyboardHeight}px` : '0' }}
+        />
+            
+            {/* Content */}
+            <div 
+              className="relative w-full bg-white rounded-t-xl animate-in slide-in-from-bottom duration-200"
+              style={{
+                maxHeight: keyboardHeight > 0 ? '50vh' : '60vh',
+                height: 'auto',
+                paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+                position: 'relative',
+                transform: 'translate3d(0, 0, 0)' // Force GPU acceleration
+              }}
+            >
+              {/* Handle bar */}
+              <div className="mx-auto mt-2 h-1.5 w-12 rounded-full bg-gray-300" />
+              
+              {/* Header */}
+              <div className="px-4 py-3 border-b border-gray-200">
+                <h2 className="text-lg font-semibold text-center">{label}</h2>
+              </div>
+              
+              {/* Search and Results */}
+              <div 
+                className="flex flex-col" 
+                style={{ 
+                  maxHeight: keyboardHeight > 0 ? 'calc(50vh - 140px)' : 'calc(60vh - 140px)' 
+                }}
+              >
+                <div className="px-4 py-3 border-b border-gray-100 flex-shrink-0">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input
+                      ref={inputRef}
+                      placeholder="Type 2 or more characters..."
+                      value={searchValue}
+                      onChange={(e) => setSearchValue(e.target.value)}
+                      className="pl-10 pr-10 h-12 text-base"
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="off"
+                      spellCheck={false}
+                      inputMode="text"
+                      style={{ fontSize: '16px' }} // Prevent zoom on iOS
+                    />
+                    {searchValue && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8"
+                        onClick={() => setSearchValue("")}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                
+                {/* Results */}
+                <div 
+                  className="flex-1 overflow-y-auto overscroll-contain"
+                  style={{ 
+                    WebkitOverflowScrolling: 'touch',
+                    touchAction: 'pan-y'
+                  }}
+                >
+                  {searchValue.length < 2 ? (
+                    <p className="text-sm text-gray-500 text-center py-8">
+                      Type at least 2 characters to search airports
+                    </p>
+                  ) : filteredAirports.length === 0 ? (
+                    <p className="text-sm text-gray-500 text-center py-8">
+                      No airports found
+                    </p>
+                  ) : (
+                    <div>
+                      {filteredAirports.slice(0, 20).map((airport) => (
+                        <button
+                          key={airport.code}
+                          className={cn(
+                            "w-full text-left px-4 py-4 hover:bg-gray-100 transition-colors",
+                            "focus:bg-gray-100 focus:outline-none",
+                            "border-b border-gray-100 last:border-0",
+                            "active:bg-gray-200",
+                            value?.code === airport.code && "bg-blue-50"
+                          )}
+                          onClick={() => handleSelect(airport)}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1 pr-2">
+                              <div className="font-medium text-gray-900">
+                                {airport.name}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {airport.city}, {airport.country} ({airport.code})
+                              </div>
+                            </div>
+                            {value?.code === airport.code && (
+                              <CheckIcon className="h-5 w-5 text-blue-600 mt-1 shrink-0" />
+                            )}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Footer */}
+              <div className="border-t border-gray-200 px-4 py-3">
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="w-full"
+                  onClick={() => setOpen(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          </div>
+    ) : null;
+
     return (
       <>
         {triggerButton}
-        <Drawer 
-          open={open} 
-          onOpenChange={setOpen}
-          shouldScaleBackground={false} // Prevent background scaling on iOS
-        >
-          <DrawerContent className="max-h-[85vh] overflow-hidden">
-            <DrawerHeader className="pb-2">
-              <DrawerTitle>{label}</DrawerTitle>
-            </DrawerHeader>
-            <div className="px-4 pb-4 overflow-hidden flex flex-col">
-              {searchContent}
-            </div>
-            <DrawerFooter className="pt-2">
-              <DrawerClose asChild>
-                <Button variant="outline" size="lg" className="w-full touch-manipulation">
-                  Cancel
-                </Button>
-              </DrawerClose>
-            </DrawerFooter>
-          </DrawerContent>
-        </Drawer>
+        {typeof window !== 'undefined' && modalContent && ReactDOM.createPortal(modalContent, document.body)}
       </>
     );
   }

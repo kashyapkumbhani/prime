@@ -74,3 +74,28 @@ button {
     transform: scale(1) !important;
   }
 }
+
+/* iOS Drawer/Modal keyboard fixes */
+.vaul-drawer[data-vaul-drawer-visible="true"] {
+  position: fixed !important;
+}
+
+/* Prevent viewport shift when keyboard appears */
+@supports (-webkit-touch-callout: none) {
+  .vaul-drawer-content {
+    position: fixed !important;
+    transform: translateY(0) !important;
+  }
+  
+  /* When keyboard is visible */
+  .vaul-drawer-content:has(input:focus) {
+    transition: none !important;
+  }
+}
+
+/* iOS visual viewport handling */
+@supports (height: 100vh) {
+  .vaul-drawer-content {
+    max-height: calc(100vh - env(safe-area-inset-bottom)) !important;
+  }
+}
